@@ -2,8 +2,10 @@
 
 use petgraph::prelude::*;
 
-use petgraph::visit::{IntoEdges, IntoNodeIdentifiers, NodeCount, NodeIndexable, VisitMap, Visitable};
 use petgraph::algo::{FloatMeasure, NegativeCycle};
+use petgraph::visit::{
+    IntoEdges, IntoNodeIdentifiers, NodeCount, NodeIndexable, VisitMap, Visitable,
+};
 
 #[derive(Debug, Clone)]
 pub struct Paths<NodeId, EdgeWeight> {
@@ -86,7 +88,6 @@ where
     G::EdgeWeight: FloatMeasure,
 {
     let ix = |i| g.to_index(i);
-
 
     // Step 1 and Step 2: initialize and relax
     let (distances, predecessors) = bellman_ford_initialize_relax(g, source);
