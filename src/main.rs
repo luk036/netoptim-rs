@@ -3,7 +3,7 @@ use petgraph::prelude::*;
 use petgraph::Graph;
 
 fn main() {
-    let graph_with_neg_cycle = Graph::<(), f32, Directed>::from_edges(&[
+    let graph_with_neg_cycle = Graph::<(), f32, Directed>::from_edges([
         (0, 1, 1.),
         (0, 2, 1.),
         (0, 3, 1.),
