@@ -1,5 +1,7 @@
 //! Bellman-Ford algorithms.
 
+pub mod neg_cycle_ai;
+
 use petgraph::prelude::*;
 
 use petgraph::algo::{FloatMeasure, NegativeCycle};
