@@ -1,43 +1,43 @@
-use petgraph::graph::DiGraph;
+use petgraph::graph::{DiGraph, NodeIndex};
 // use petgraph::visit::IntoNeighborsDirected;
 
-struct NegCycleFinder<'a> {
-    gra: &'a DiGraph<(), f64>,
-    pred: std::collections::HashMap<petgraph::graph::NodeIndex, petgraph::graph::NodeIndex>,
+pub struct NegCycleFinder<'a> {
+    pub gra: &'a DiGraph<(), f64>,
+    pub pred: std::collections::HashMap<NodeIndex, NodeIndex>,
 }
 
 impl<'a> NegCycleFinder<'a> {
-    fn new(gra: &'a DiGraph<(), f64>) -> Self {
+    pub fn new(gra: &'a DiGraph<(), f64>) -> Self {
         Self {
             gra,
             pred: std::collections::HashMap::new(),
         }
     }
 
-    fn find_cycle(&self) -> impl Iterator<Item = petgraph::graph::NodeIndex> + '_ {
+    pub fn find_cycle(&self) -> Option<NodeIndex> {
         let mut visited = std::collections::HashMap::new();
-        self.gra
-            .node_indices()
-            .filter(move |&v| !visited.contains_key(&v))
-            .filter_map(move |v| {
-                let mut u = v;
-                while !visited.contains_key(&u) {
-                    visited.insert(u, v);
-                    u = self.pred.get(&u);
-                    if visited.contains_key(&u) {
-                        if visited[&u] == v {
-                            return Some(u);
-                        }
-                        break;
+        for v in self.gra.node_indices() {
+            if visited.contains_key(&v) {
+                continue;
+            }
+            let mut u = v;
+            while !visited.contains_key(&u) {
+                visited.insert(u, v);
+                u = *self.pred.get(&u).unwrap();
+                if visited.contains_key(&u) {
+                    if visited[&u] == v {
+                        return Some(u);
                     }
+                    break;
                 }
-                None
-            })
+            }
+        }
+        None
     }
 
-    fn relax<F>(&mut self, dist: &mut [f64], get_weight: F) -> bool
+    pub fn relax<F>(&mut self, dist: &mut [f64], get_weight: F) -> bool
     where
-        F: Fn((petgraph::graph::NodeIndex, petgraph::graph::NodeIndex)) -> f64,
+        F: Fn((NodeIndex, NodeIndex)) -> f64,
     {
         let mut changed = false;
         for u in self.gra.node_indices() {
@@ -57,29 +57,25 @@ impl<'a> NegCycleFinder<'a> {
         changed
     }
 
-    fn find_neg_cycle<F>(
+    pub fn find_neg_cycle<F>(
         &mut self,
         dist: &mut [f64],
         get_weight: F,
-    ) -> Option<Vec<(petgraph::graph::NodeIndex, petgraph::graph::NodeIndex)>>
+    ) -> Option<Vec<(NodeIndex, NodeIndex)>>
     where
-        F: Fn((petgraph::graph::NodeIndex, petgraph::graph::NodeIndex)) -> f64,
+        F: Fn((NodeIndex, NodeIndex)) -> f64,
     {
         self.pred.clear();
-        let mut found = false;
-        while !found && self.relax(dist, &get_weight) {
-            for v in self.find_cycle() {
-                found = true;
+        while self.relax(dist, &get_weight) {
+            let v_opt = self.find_cycle();
+            if let Some(v) = v_opt {
                 return Some(self.cycle_list(v));
             }
         }
         None
     }
 
-    fn cycle_list(
-        &self,
-        handle: petgraph::graph::NodeIndex,
-    ) -> Vec<(petgraph::graph::NodeIndex, petgraph::graph::NodeIndex)> {
+    fn cycle_list(&self, handle: NodeIndex) -> Vec<(NodeIndex, NodeIndex)> {
         let mut v = handle;
         let mut cycle = Vec::new();
         loop {
