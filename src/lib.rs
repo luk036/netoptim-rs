@@ -38,7 +38,7 @@ pub struct Paths<NodeId, EdgeWeight> {
 /// let b = g.add_node(());
 /// let c = g.add_node(());
 /// let d = g.add_node(());
-/// let e = g.add_node(());
+/// let edge = g.add_node(());
 /// let f = g.add_node(());
 /// g.extend_with_edges(&[
 ///     (0, 1, 2.0),
@@ -57,17 +57,17 @@ pub struct Paths<NodeId, EdgeWeight> {
 /// // | 4     | 7     |
 /// // d       f       | 5
 /// // | 1     | 1     |
-/// // \------ e ------/
+/// // \------ edge ------/
 ///
 /// let path = bellman_ford(&g, a);
 /// assert!(path.is_ok());
 /// let path = path.unwrap();
 /// assert_eq!(path.distances, vec![    0.0,     2.0,    3.0,    4.0,     5.0,     6.0]);
-/// assert_eq!(path.predecessors, vec![None, Some(a),Some(b),Some(a), Some(d), Some(e)]);
+/// assert_eq!(path.predecessors, vec![None, Some(a),Some(b),Some(a), Some(d), Some(edge)]);
 ///
 /// // Node f (indice 5) can be reach from a with a path costing 6.
-/// // Predecessor of f is Some(e) which predecessor is Some(d) which predecessor is Some(a).
-/// // Thus the path from a to f is a <-> d <-> e <-> f
+/// // Predecessor of f is Some(edge) which predecessor is Some(d) which predecessor is Some(a).
+/// // Thus the path from a to f is a <-> d <-> edge <-> f
 ///
 /// let graph_with_neg_cycle = Graph::<(), f32, Undirected>::from_edges(&[
 ///         (0, 1, -2.0),
