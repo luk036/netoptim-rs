@@ -4,13 +4,16 @@ use petgraph::visit::IntoNodeIdentifiers;
 
 // use petgraph::visit::IntoNeighborsDirected;
 
-pub struct NegCycleFinder<'a> {
-    pub digraph: &'a DiGraph<(), f64>,
+pub struct NegCycleFinder<'a, V, D> {
+    pub digraph: &'a DiGraph<V, D>,
     pub pred: std::collections::HashMap<NodeIndex, NodeIndex>,
 }
 
-impl<'a> NegCycleFinder<'a> {
-    pub fn new(digraph: &'a DiGraph<(), f64>) -> Self {
+impl<'a, V, D> NegCycleFinder<'a, V, D>
+where
+    D: std::ops::Add<Output = D> + std::cmp::PartialOrd + Copy,
+{
+    pub fn new(digraph: &'a DiGraph<V, D>) -> Self {
         Self {
             digraph,
             pred: std::collections::HashMap::new(),
@@ -41,7 +44,7 @@ impl<'a> NegCycleFinder<'a> {
         None
     }
 
-    pub fn relax(&mut self, dist: &mut [f64]) -> bool {
+    pub fn relax(&mut self, dist: &mut [D]) -> bool {
         let mut changed = false;
         for utx in self.digraph.node_identifiers() {
             for edge in self.digraph.edges(utx) {
@@ -64,7 +67,7 @@ impl<'a> NegCycleFinder<'a> {
         changed
     }
 
-    pub fn find_neg_cycle(&mut self, dist: &mut [f64]) -> Option<Vec<(NodeIndex, NodeIndex)>> {
+    pub fn howard(&mut self, dist: &mut [D]) -> Option<Vec<(NodeIndex, NodeIndex)>> {
         self.pred.clear();
         while self.relax(dist) {
             let v_opt = self.find_cycle();
@@ -93,6 +96,7 @@ impl<'a> NegCycleFinder<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use num::rational::Ratio;
 
     #[test]
     fn it_works() {
@@ -102,18 +106,63 @@ mod tests {
 
     #[test]
     fn test_neg_cycle() {
-        let digraph = DiGraph::<(), f64>::from_edges([
-            (0, 1, 1.),
-            (0, 2, 1.),
-            (0, 3, 1.),
-            (1, 3, 1.),
-            (2, 1, 1.),
-            (3, 2, -3.),
+        let digraph = DiGraph::<(), Ratio<i32>>::from_edges([
+            (0, 1, Ratio::new(1, 1)),
+            (0, 2, Ratio::new(1, 1)),
+            (0, 3, Ratio::new(1, 1)),
+            (1, 3, Ratio::new(1, 1)),
+            (2, 1, Ratio::new(1, 1)),
+            (3, 2, Ratio::new(-3, 1)),
         ]);
 
         let mut ncf = NegCycleFinder::new(&digraph);
-        let mut dist = [0.0, 0.0, 0.0, 0.0];
-        let result = ncf.find_neg_cycle(&mut dist);
+        let mut dist = [
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+        ];
+        let result = ncf.howard(&mut dist);
         assert!(result.is_some());
+    }
+
+    #[test]
+    fn test_neg_cycle2() {
+        let mut graph = DiGraph::new();
+        let a = graph.add_node("a");
+        let b = graph.add_node("b");
+        let c = graph.add_node("c");
+        let d = graph.add_node("d");
+        let e = graph.add_node("e");
+        let f = graph.add_node("f");
+        let g = graph.add_node("g");
+        let h = graph.add_node("h");
+        let i = graph.add_node("i");
+        graph.add_edge(a, b, Ratio::new(1, 1));
+        graph.add_edge(a, c, Ratio::new(1, 1));
+        graph.add_edge(b, d, Ratio::new(1, 1));
+        graph.add_edge(c, d, Ratio::new(1, 1));
+        graph.add_edge(d, e, Ratio::new(-3, 1));
+        graph.add_edge(d, f, Ratio::new(1, 1));
+        graph.add_edge(e, g, Ratio::new(1, 1));
+        graph.add_edge(f, g, Ratio::new(1, 1));
+        graph.add_edge(g, h, Ratio::new(1, 1));
+        graph.add_edge(h, i, Ratio::new(1, 1));
+        graph.add_edge(i, f, Ratio::new(1, 1));
+
+        let mut ncf = NegCycleFinder::new(&graph);
+        let mut dist = [
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+        ];
+        let result = ncf.howard(&mut dist);
+        assert!(result.is_none());
     }
 }
