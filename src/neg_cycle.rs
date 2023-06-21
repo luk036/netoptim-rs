@@ -1,5 +1,5 @@
-use petgraph::graph::{DiGraph, EdgeReference, NodeIndex};
-// use petgraph::prelude::*;
+use petgraph::graph::{EdgeReference, NodeIndex};
+use petgraph::prelude::*;
 use petgraph::visit::EdgeRef;
 use petgraph::visit::IntoNodeIdentifiers;
 
@@ -79,7 +79,8 @@ where
     /// # Examples
     ///
     /// ```
-    /// use netoptim_rs::neg_cycle_ai::NegCycleFinder;
+    /// use petgraph::prelude::*;
+    /// use netoptim_rs::neg_cycle::NegCycleFinder;
     /// let digraph = DiGraph::<(), i32>::from_edges([
     ///     (0, 1, 1),
     ///     (0, 2, 1),

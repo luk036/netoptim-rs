@@ -72,14 +72,14 @@ where
     #[allow(dead_code)]
     pub fn new(gra: &'a DiGraph<V, R>, omega: P) -> Self {
         Self {
-            ncf: NegCycleFinder::new(&gra),
+            ncf: NegCycleFinder::new(gra),
             omega,
         }
     }
 
     #[allow(dead_code)]
     pub fn run(&mut self, dist: &mut [R], ratio: &mut R) -> Vec<(NodeIndex, NodeIndex)> {
-        let mut r_min = ratio.clone();
+        let mut r_min = *ratio;
         let mut c_min = Vec::<(NodeIndex, NodeIndex)>::new();
         let mut cycle = Vec::<(NodeIndex, NodeIndex)>::new();
         loop {
