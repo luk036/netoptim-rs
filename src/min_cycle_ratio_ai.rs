@@ -51,53 +51,53 @@ impl FromStr for R {
     }
 }
 
-impl FloatMeasure for R {
-    fn is_negative(&self) -> bool {
-        self.0 < 0.0
-    }
+// impl FloatMeasure for R {
+//     fn is_negative(&self) -> bool {
+//         self.0 < 0.0
+//     }
 
-    fn is_positive(&self) -> bool {
-        self.0 > 0.0
-    }
+//     fn is_positive(&self) -> bool {
+//         self.0 > 0.0
+//     }
 
-    fn is_zero(&self) -> bool {
-        self.0 == 0.0
-    }
+//     fn is_zero(&self) -> bool {
+//         self.0 == 0.0
+//     }
 
-    fn min_positive_value() -> Self {
-        R(std::f64::EPSILON)
-    }
+//     fn min_positive_value() -> Self {
+//         R(std::f64::EPSILON)
+//     }
 
-    fn max_value() -> Self {
-        R(std::f64::MAX)
-    }
+//     fn max_value() -> Self {
+//         R(std::f64::MAX)
+//     }
 
-    fn min_value() -> Self {
-        R(std::f64::MIN)
-    }
+//     fn min_value() -> Self {
+//         R(std::f64::MIN)
+//     }
 
-    fn nan() -> Self {
-        R(std::f64::NAN)
-    }
+//     fn nan() -> Self {
+//         R(std::f64::NAN)
+//     }
 
-    fn infinity() -> Self {
-        R(std::f64::INFINITY)
-    }
+//     fn infinity() -> Self {
+//         R(std::f64::INFINITY)
+//     }
 
-    fn neg_infinity() -> Self {
-        R(std::f64::NEG_INFINITY)
-    }
+//     fn neg_infinity() -> Self {
+//         R(std::f64::NEG_INFINITY)
+//     }
 
-    fn epsilon() -> Self {
-        R(std::f64::EPSILON)
-    }
+//     fn epsilon() -> Self {
+//         R(std::f64::EPSILON)
+//     }
 
-    fn abs_diff_eq(&self, other: &Self, max_diff: Self) -> bool {
-        (self.0 - other.0).abs() <= max_diff.0
-    }
-}
+//     fn abs_diff_eq(&self, other: &Self, max_diff: Self) -> bool {
+//         (self.0 - other.0).abs() <= max_diff.0
+//     }
+// }
 
-fn set_default<D: Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64> + FloatMeasure>(
+fn set_default<D: Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64>>(
     gra: &mut DiGraph<V, D>, weight: &str, value: D
 ) {
     for u in gra.node_indices() {
@@ -109,13 +109,12 @@ fn set_default<D: Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + Fr
     }
 }
 
-struct CycleRatioAPI<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64> + FloatMeasure> {
+struct CycleRatioAPI<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64>> {
     gra: &'a DiGraph<V, HashMap<String, D>>,
 }
 
-impl<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64> + FloatMeasure> CycleRatioAPI<'a, D> {
+impl<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64>> CycleRatioAPI<'a, D> {
     fn distance(&self, ratio: R, e: EdgeRef<V, HashMap<String, D>>) -> R {
-        let (u, v) = (e.source(), e.target());
         let cost = *e.weight().get("cost").unwrap();
         let time = *e.weight().get("time").unwrap();
         cost - ratio * time
@@ -157,6 +156,6 @@ fn main() {
     dist.insert(V(2), R::from(2.0));
     let solver = MinCycleRatioSolver { gra: &gra };
     let (ratio, cycle) = solver.run(&mut dist, R::from(0.0));
-    println!("{:?} {:?}", ratio, cycle);
+    // println!("{:?} {:?}", ratio, cycle);
 }
 

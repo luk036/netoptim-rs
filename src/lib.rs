@@ -1,8 +1,8 @@
 //! Bellman-Ford algorithms.
 
-pub mod neg_cycle_ai;
-// pub mod neg_cycle_ai2;
-// pub mod parametric_ai3;
+pub mod neg_cycle;
+pub mod parametric;
+// pub mod min_cycle_ratio_ai;
 
 use petgraph::prelude::*;
 
