@@ -1,3 +1,5 @@
+use crate::parametric::{ParametricAPI, MaxParametricSolver};
+
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::ops::{Div, Sub};
@@ -9,7 +11,7 @@ use std::marker::Copy;
 use std::num::ParseFloatError;
 use std::str::FromStr;
 
-use petgraph::graph::DiGraph;
+use petgraph::graph::{DiGraph, EdgeReference};
 use petgraph::prelude::*;
 use petgraph::visit::EdgeRef;
 use petgraph::algo::FloatMeasure;
@@ -97,7 +99,7 @@ impl FromStr for R {
 //     }
 // }
 
-fn set_default<D: Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64>>(
+fn set_default<D: Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64> + FloatMeasure>(
     gra: &mut DiGraph<V, D>, weight: &str, value: D
 ) {
     for u in gra.node_indices() {
@@ -109,12 +111,12 @@ fn set_default<D: Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + Fr
     }
 }
 
-struct CycleRatioAPI<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64>> {
+struct CycleRatio<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64>> {
     gra: &'a DiGraph<V, HashMap<String, D>>,
 }
 
-impl<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64>> CycleRatioAPI<'a, D> {
-    fn distance(&self, ratio: R, e: EdgeRef<V, HashMap<String, D>>) -> R {
+impl<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64>> ParametricAPI<HashMap<String, D>, R> for CycleRatio<'a, R> {
+    fn distance(&self, ratio: &R, e: &EdgeReference<HashMap<String, D>>) -> R {
         let cost = *e.weight().get("cost").unwrap();
         let time = *e.weight().get("time").unwrap();
         cost - ratio * time
@@ -133,7 +135,7 @@ struct MinCycleRatioSolver<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D>
 
 impl<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64> + FloatMeasure> MinCycleRatioSolver<'a, D> {
     fn run(&self, dist: &mut HashMap<V, R>, r0: R) -> (R, Vec<EdgeIndex<V>>) {
-        let omega = CycleRatioAPI { gra: self.gra };
+        let omega = CycleRatio { gra: self.gra };
         let mut solver = MaxParametricSolver::new(self.gra, omega);
         let (ratio, cycle) = solver.run(dist, r0);
         (ratio, cycle)

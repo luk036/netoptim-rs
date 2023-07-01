@@ -7,7 +7,7 @@ use std::ops::Mul;
 use std::ops::Neg;
 use std::ops::Sub;
 
-use petgraph::graph::{DiGraph, EdgeReference, NodeIndex};
+use petgraph::graph::{DiGraph, EdgeReference};
 // use petgraph::prelude::*;
 // use petgraph::visit::EdgeRef;
 // use petgraph::visit::IntoNodeIdentifiers;
@@ -20,24 +20,17 @@ use num::traits::Zero;
 
 use crate::neg_cycle::NegCycleFinder;
 
-trait ParametricAPI<V, R>
+pub trait ParametricAPI<E, R>
 where
-    R: Copy
-        + PartialOrd
-        + Add<Output = R>
-        + Sub<Output = R>
-        + Mul<Output = R>
-        + Div<Output = R>
-        + Neg<Output = R>
-        + Inv<Output = R>,
-    V: Eq + Hash + Clone,
+    R: Copy + PartialOrd,
+    E: Clone,
 {
     fn distance(&self, ratio: &R, edge: &EdgeReference<R>) -> R;
-    fn zero_cancel(&self, cycle: &Vec<(NodeIndex, NodeIndex)>) -> R;
+    fn zero_cancel(&self, cycle: &Vec<EdgeReference<R>>) -> R;
 }
 
 #[derive(Debug)]
-struct MaxParametricSolver<'a, V, R, P>
+pub struct MaxParametricSolver<'a, V, R, P>
 where
     R: Copy
         + PartialOrd
@@ -69,7 +62,6 @@ where
     V: Eq + Hash + Clone,
     P: ParametricAPI<V, R>,
 {
-    #[allow(dead_code)]
     pub fn new(gra: &'a DiGraph<V, R>, omega: P) -> Self {
         Self {
             ncf: NegCycleFinder::new(gra),
@@ -77,11 +69,10 @@ where
         }
     }
 
-    #[allow(dead_code)]
-    pub fn run(&mut self, dist: &mut [R], ratio: &mut R) -> Vec<(NodeIndex, NodeIndex)> {
+    pub fn run(&mut self, dist: &mut [R], ratio: &mut R) -> Vec<EdgeReference<R>> {
         let mut r_min = *ratio;
-        let mut c_min = Vec::<(NodeIndex, NodeIndex)>::new();
-        let mut cycle = Vec::<(NodeIndex, NodeIndex)>::new();
+        let mut c_min = Vec::<EdgeReference<R>>::new();
+        let mut cycle = Vec::<EdgeReference<R>>::new();
         loop {
             if let Some(ci) = self.ncf.howard(dist, |e| self.omega.distance(ratio, &e)) {
                 let ri = self.omega.zero_cancel(&ci);

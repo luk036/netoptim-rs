@@ -8,7 +8,7 @@ use petgraph::visit::IntoNodeIdentifiers;
 #[derive(Debug, Clone)]
 pub struct NegCycleFinder<'a, V, D> {
     pub digraph: &'a DiGraph<V, D>,
-    pub pred: std::collections::HashMap<NodeIndex, NodeIndex>,
+    pub pred: std::collections::HashMap<NodeIndex, (NodeIndex, EdgeReference<'a, D>)>,
 }
 
 impl<'a, V, D> NegCycleFinder<'a, V, D>
@@ -36,7 +36,8 @@ where
                 if !self.pred.contains_key(&utx) {
                     break;
                 }
-                utx = *self.pred.get(&utx).unwrap();
+                let result = *self.pred.get(&utx).unwrap();
+                utx = result.0;
                 if visited.contains_key(&utx) {
                     if visited[&utx] == vtx {
                         return Some(utx);
@@ -66,7 +67,7 @@ where
                 let distance = dist[utx.index()] + weight;
                 if dist[vtx.index()] > distance {
                     dist[vtx.index()] = distance;
-                    self.pred.insert(vtx, utx);
+                    self.pred.insert(vtx, (utx, edge));
                     changed = true;
                 }
             }
@@ -98,7 +99,7 @@ where
         &mut self,
         dist: &mut [D],
         get_weight: F,
-    ) -> Option<Vec<(NodeIndex, NodeIndex)>>
+    ) -> Option<Vec<EdgeReference<'a, D>>>
     where
         F: Fn(EdgeReference<D>) -> D,
     {
@@ -112,12 +113,12 @@ where
         None
     }
 
-    fn cycle_list(&self, handle: NodeIndex) -> Vec<(NodeIndex, NodeIndex)> {
+    fn cycle_list(&self, handle: NodeIndex) -> Vec<EdgeReference<'a, D>> {
         let mut vtx = handle;
         let mut cycle = Vec::new();
         loop {
-            let utx = self.pred[&vtx];
-            cycle.push((utx, vtx));
+            let (utx, edge) = self.pred[&vtx];
+            cycle.push(edge);
             vtx = utx;
             if vtx == handle {
                 break;
