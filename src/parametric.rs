@@ -29,6 +29,19 @@ where
     fn zero_cancel(&self, cycle: &Vec<EdgeReference<R>>) -> R;
 }
 
+/**
+ * Maximum Parametric Solver
+ *
+ * This class solves the following parametric network problem:
+ *
+ *  max  r
+ *  s.t. dist[v] - dist[u] <= distrance(e, r)
+ *       \forall e(u, v) \in gra(V, E)
+ *
+ * A parametric network problem refers to a type of optimization problem that
+ * involves finding the optimal solution to a network flow problem as a function
+ * of one single parameter.
+ */
 #[derive(Debug)]
 pub struct MaxParametricSolver<'a, V, R, P>
 where
