@@ -129,6 +129,25 @@ impl<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + Fro
     }
 }
 
+/**
+ * @brief Minimum Cycle Ratio Solver
+ *
+ * The minimum cycle ratio (MCR) problem is a fundamental problem in the
+ * analysis of directed graphs. Given a directed graph, the MCR problem seeks to
+ * find the cycle with the minimum ratio of the sum of edge weights to the
+ * number of edges in the cycle. In other words, the MCR problem seeks to find
+ * the "tightest" cycle in the graph, where the tightness of a cycle is measured
+ * by the ratio of the total weight of the cycle to its length.
+ *
+ * The MCR problem has many applications in the analysis of discrete event
+ * systems, such as digital circuits and communication networks. It is closely
+ * related to other problems in graph theory, such as the shortest path problem
+ * and the maximum flow problem. Efficient algorithms for solving the MCR
+ * problem are therefore of great practical importance.
+ *
+ * @tparam DiGraph
+ * @tparam Ratio
+ */
 struct MinCycleRatioSolver<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64> + FloatMeasure> {
     gra: &'a DiGraph<V, HashMap<String, D>>,
 }
