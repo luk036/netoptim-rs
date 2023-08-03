@@ -6,9 +6,9 @@ use petgraph::visit::IntoNodeIdentifiers;
 // use petgraph::visit::IntoNeighborsDirected;
 
 /// The `NegCycleFinder` struct is used to find negative cycles in a directed graph.
-/// 
+///
 /// Properties:
-/// 
+///
 /// * `digraph`: The `digraph` property is a reference to a directed graph (`DiGraph`) that the
 /// `NegCycleFinder` is operating on. It is annotated with a lifetime `'a`, indicating that the
 /// reference is valid for a certain scope.
@@ -26,14 +26,14 @@ where
     D: std::ops::Add<Output = D> + std::cmp::PartialOrd + Copy,
 {
     /// The `new` function creates a new `NegCycleFinder` object with an empty predecessor map.
-    /// 
+    ///
     /// Arguments:
-    /// 
+    ///
     /// * `digraph`: A reference to a directed graph (`DiGraph`) that the `NegCycleFinder` will operate
     /// on.
-    /// 
+    ///
     /// Returns:
-    /// 
+    ///
     /// The `new` function is returning an instance of the `NegCycleFinder<V, D>` struct.
     /// Creates a new [`NegCycleFinder<V, D>`].
     pub fn new(digraph: &'a DiGraph<V, D>) -> Self {
@@ -44,9 +44,9 @@ where
     }
 
     /// The `find_cycle` function in Rust returns the first node in a cycle found in a directed graph.
-    /// 
+    ///
     /// Returns:
-    /// 
+    ///
     /// The function `find_cycle` returns an `Option<NodeIndex>`.
     pub fn find_cycle(&self) -> Option<NodeIndex> {
         let mut visited = std::collections::HashMap::new();
@@ -75,17 +75,17 @@ where
 
     /// The `relax` function updates the distances between nodes in a graph based on the weights of the
     /// edges, and returns a boolean indicating whether any distances were changed.
-    /// 
+    ///
     /// Arguments:
-    /// 
+    ///
     /// * `dist`: `dist` is a mutable reference to a slice of type `D`. It represents the distances from
     /// a source node to each node in a graph.
     /// * `get_weight`: The `get_weight` parameter is a closure that takes an `EdgeReference<D>` as
     /// input and returns a value of type `D`. This closure is used to calculate the weight of each edge
     /// in the graph. The `EdgeReference<D>` represents a reference to an edge in the graph, and
-    /// 
+    ///
     /// Returns:
-    /// 
+    ///
     /// a boolean value.
     pub fn relax<F>(&mut self, dist: &mut [D], get_weight: F) -> bool
     where
@@ -115,18 +115,18 @@ where
 
     /// The `howard` function implements Howard's algorithm for finding negative cycles in a directed
     /// graph.
-    /// 
+    ///
     /// Arguments:
-    /// 
+    ///
     /// * `dist`: `dist` is a mutable reference to an array of type `D`. This array is used to store the
     /// distances from the source vertex to each vertex in the graph. The algorithm will update the
     /// distances during the execution.
     /// * `get_weight`: `get_weight` is a closure that takes an `EdgeReference<D>` and returns the
     /// weight of that edge. The `howard` function uses this closure to get the weight of each edge in
     /// the graph.
-    /// 
+    ///
     /// Returns:
-    /// 
+    ///
     /// The `howard` function returns an `Option<Vec<EdgeReference<'a, D>>>`.
     /// Howard's algorithm for finding negative cycles
     ///
@@ -148,11 +148,7 @@ where
     /// let result = ncf.howard(&mut dist, |e| { *e.weight()});
     /// assert!(result.is_some());
     /// ```
-    pub fn howard<F>(
-        &mut self,
-        dist: &mut [D],
-        get_weight: F,
-    ) -> Option<Vec<EdgeReference<'a, D>>>
+    pub fn howard<F>(&mut self, dist: &mut [D], get_weight: F) -> Option<Vec<EdgeReference<'a, D>>>
     where
         F: Fn(EdgeReference<D>) -> D,
     {
@@ -168,14 +164,14 @@ where
 
     /// The function `cycle_list` takes a node index as input and returns a vector of edge references
     /// that form a cycle in a graph.
-    /// 
+    ///
     /// Arguments:
-    /// 
+    ///
     /// * `handle`: The `handle` parameter is of type `NodeIndex`. It represents the starting node index
     /// from which the cycle traversal will begin.
-    /// 
+    ///
     /// Returns:
-    /// 
+    ///
     /// The function `cycle_list` returns a vector of `EdgeReference` objects.
     fn cycle_list(&self, handle: NodeIndex) -> Vec<EdgeReference<'a, D>> {
         let mut vtx = handle;
