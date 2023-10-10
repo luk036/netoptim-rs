@@ -11,7 +11,7 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 serde_json = "1.0.106"
 num = { version = "0.4.0" }
-num-traits = { version = "0.2.15" }
+num-traits = { version = "0.2.17" }
 
 [dependencies.petgraph]
 version = "0.6.4"
