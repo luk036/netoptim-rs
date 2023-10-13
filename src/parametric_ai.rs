@@ -24,7 +24,7 @@ trait ParametricAPI<V> {
 }
 
 struct MaxParametric<'a, V, W, P> {
-    gra: &'a DiGraph<V, W>,
+    grph: &'a DiGraph<V, W>,
     ratio: Ratio<P>,
     omega: &'a dyn ParametricAPI<V>,
     dist: HashMap<V, Ratio<P>>,
@@ -37,14 +37,14 @@ where
     P: Float + Zero + One + PartialOrd + Copy,
 {
     fn get_weight(&self, edge: &petgraph::graph::EdgeReference<W>) -> Ratio<P> {
-        let (u, v) = self.gra.edge_endpoints(edge.id()).unwrap();
-        self.omega.distance(self.ratio, (self.gra.node_weight(u).unwrap(), self.gra.node_weight(v).unwrap()))
+        let (u, v) = self.grph.edge_endpoints(edge.id()).unwrap();
+        self.omega.distance(self.ratio, (self.grph.node_weight(u).unwrap(), self.grph.node_weight(v).unwrap()))
     }
 
     fn find_neg_cycle(&self) -> Option<Cycle<'a, V>> {
         let mut cycle = None;
         let mut dist = self.dist.clone();
-        let mut neg_cycle = NegativeCycle::new(&self.gra, Some(&mut dist));
+        let mut neg_cycle = NegativeCycle::new(&self.grph, Some(&mut dist));
         if let Some(edge) = neg_cycle.next_edge() {
             cycle = Some(neg_cycle.find_cycle(edge));
         }

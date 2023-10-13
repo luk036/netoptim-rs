@@ -21,9 +21,9 @@ where
     R: PartialOrd + Default + Copy + Add<Output = R> + Sub<Output = R> + Mul<Output = R> + Div<Output = R> + Debug,
     P: ParametricAPI<V, R>,
 {
-    pub fn new(gra: &HashMap<V, HashMap<V, R>>, omega: P) -> Self {
+    pub fn new(grph: &HashMap<V, HashMap<V, R>>, omega: P) -> Self {
         Self {
-            ncf: NegCycleFinder::new(gra),
+            ncf: NegCycleFinder::new(grph),
             omega,
         }
     }
@@ -53,7 +53,7 @@ where
 }
 
 pub struct NegCycleFinder<V, R, P> {
-    gra: HashMap<V, HashMap<V, R>>,
+    grph: HashMap<V, HashMap<V, R>>,
     omega: P,
 }
 
@@ -63,9 +63,9 @@ where
     R: PartialOrd + Default + Copy + Add<Output = R> + Sub<Output = R> + Mul<Output = R> + Div<Output = R> + Debug,
     P: ParametricAPI<V, R>,
 {
-    pub fn new(gra: &HashMap<V, HashMap<V, R>>) -> Self {
+    pub fn new(grph: &HashMap<V, HashMap<V, R>>) -> Self {
         Self {
-            gra: gra.clone(),
+            grph: grph.clone(),
             omega: Default::default(),
         }
     }
@@ -74,21 +74,21 @@ where
     where
         F: FnMut(&(V, V)) -> R,
     {
-        let n = self.gra.len();
+        let n = self.grph.len();
         let mut prev = vec![None; n];
         let mut last = vec![None; n];
         let mut to = vec![None; n];
         let mut label = vec![R::default(); n];
         let mut id = vec![0; n];
         let mut q = VecDeque::new();
-        for s in self.gra.keys() {
+        for s in self.grph.keys() {
             dist.insert(s.clone(), R::default());
             q.push_back(s.clone());
         }
         for k in 0..n {
             let mut upd = false;
             for i in 0..n {
-                for (j, &w) in self.gra[&id[i]].iter() {
+                for (j, &w) in self.grph[&id[i]].iter() {
                     let j = self.get_id(&mut id, &mut to, j.clone());
                     let d = dist[&id[i]] + cost(&(id[i], j.clone()));
                     if dist[&j] > d {
@@ -120,10 +120,10 @@ where
     }
 
     fn get_id(&self, id: &mut Vec<usize>, to: &mut Vec<Option<usize>>, v: V) -> usize {
-        let n = self.gra.len();
+        let n = self.grph.len();
         let i = id[v.hash() % n];
         if let Some(j) = to[i] {
-            if self.gra[&i].contains_key(&v) {
+            if self.grph[&i].contains_key(&v) {
                 return j;
             }
         }
@@ -140,12 +140,12 @@ mod tests {
 
     #[test]
     fn test_max_parametric_solver() {
-        let mut gra = HashMap::new();
-        gra.insert(0, [(1, 1), (2, 2)].iter().cloned().collect());
-        gra.insert(1, [(2, 3)].iter().cloned().collect());
-        gra.insert(2, [(0, -10)].iter().cloned().collect());
+        let mut grph = HashMap::new();
+        grph.insert(0, [(1, 1), (2, 2)].iter().cloned().collect());
+        grph.insert(1, [(2, 3)].iter().cloned().collect());
+        grph.insert(2, [(0, -10)].iter().cloned().collect());
         let omega = Omega {};
-        let mut solver = MaxParametricSolver::new(&gra, omega);
+        let mut solver = MaxParametricSolver::new(&grph, omega);
         let mut dist = HashMap::new();
         let (ratio, cycle) = solver.run(&mut dist, 1.0);
         assert_eq!(ratio, -0.5);

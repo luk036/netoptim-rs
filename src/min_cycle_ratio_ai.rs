@@ -100,19 +100,19 @@ impl FromStr for R {
 // }
 
 fn set_default<D: Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64> + FloatMeasure>(
-    gra: &mut DiGraph<V, D>, weight: &str, value: D
+    grph: &mut DiGraph<V, D>, weight: &str, value: D
 ) {
-    for u in gra.node_indices() {
-        for e in gra.edges(u) {
-            if gra.edge_weight_mut(e).unwrap().get(weight).is_none() {
-                gra.edge_weight_mut(e).unwrap().insert(weight.to_string(), value);
+    for u in grph.node_indices() {
+        for e in grph.edges(u) {
+            if grph.edge_weight_mut(e).unwrap().get(weight).is_none() {
+                grph.edge_weight_mut(e).unwrap().insert(weight.to_string(), value);
             }
         }
     }
 }
 
 struct CycleRatio<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64>> {
-    gra: &'a DiGraph<V, HashMap<String, D>>,
+    grph: &'a DiGraph<V, HashMap<String, D>>,
 }
 
 impl<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64>> ParametricAPI<HashMap<String, D>, R> for CycleRatio<'a, R> {
@@ -123,8 +123,8 @@ impl<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + Fro
     }
 
     fn zero_cancel(&self, cycle: Vec<EdgeIndex<V>>) -> R {
-        let total_cost = cycle.iter().map(|e| *self.gra.edge_weight(*e).unwrap().get("cost").unwrap()).sum::<D>();
-        let total_time = cycle.iter().map(|e| *self.gra.edge_weight(*e).unwrap().get("time").unwrap()).sum::<D>();
+        let total_cost = cycle.iter().map(|e| *self.grph.edge_weight(*e).unwrap().get("cost").unwrap()).sum::<D>();
+        let total_time = cycle.iter().map(|e| *self.grph.edge_weight(*e).unwrap().get("time").unwrap()).sum::<D>();
         total_cost / total_time
     }
 }
@@ -149,33 +149,33 @@ impl<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + Fro
  * @tparam Ratio
  */
 struct MinCycleRatioSolver<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64> + FloatMeasure> {
-    gra: &'a DiGraph<V, HashMap<String, D>>,
+    grph: &'a DiGraph<V, HashMap<String, D>>,
 }
 
 impl<'a, D: 'a + Copy + Debug + PartialOrd + Sub<Output=D> + Div<Output=D> + From<f64> + FloatMeasure> MinCycleRatioSolver<'a, D> {
     fn run(&self, dist: &mut HashMap<V, R>, r0: R) -> (R, Vec<EdgeIndex<V>>) {
-        let omega = CycleRatio { gra: self.gra };
-        let mut solver = MaxParametricSolver::new(self.gra, omega);
+        let omega = CycleRatio { grph: self.grph };
+        let mut solver = MaxParametricSolver::new(self.grph, omega);
         let (ratio, cycle) = solver.run(dist, r0);
         (ratio, cycle)
     }
 }
 
 fn main() {
-    let mut gra = DiGraph::<V, HashMap<String, R>>::new();
-    let a = gra.add_node(V(0));
-    let b = gra.add_node(V(1));
-    let c = gra.add_node(V(2));
-    gra.add_edge(a, b, HashMap::new());
-    gra.add_edge(b, c, HashMap::new());
-    gra.add_edge(c, a, HashMap::new());
-    set_default(&mut gra, "cost", R::from(1.0));
-    set_default(&mut gra, "time", R::from(1.0));
+    let mut grph = DiGraph::<V, HashMap<String, R>>::new();
+    let a = grph.add_node(V(0));
+    let b = grph.add_node(V(1));
+    let c = grph.add_node(V(2));
+    grph.add_edge(a, b, HashMap::new());
+    grph.add_edge(b, c, HashMap::new());
+    grph.add_edge(c, a, HashMap::new());
+    set_default(&mut grph, "cost", R::from(1.0));
+    set_default(&mut grph, "time", R::from(1.0));
     let mut dist = HashMap::new();
     dist.insert(V(0), R::from(0.0));
     dist.insert(V(1), R::from(1.0));
     dist.insert(V(2), R::from(2.0));
-    let solver = MinCycleRatioSolver { gra: &gra };
+    let solver = MinCycleRatioSolver { grph: &grph };
     let (ratio, cycle) = solver.run(&mut dist, R::from(0.0));
     // println!("{:?} {:?}", ratio, cycle);
 }

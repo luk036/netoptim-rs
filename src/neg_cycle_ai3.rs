@@ -2,21 +2,21 @@ use petgraph::graph::DiGraph;
 // use petgraph::visit::IntoNeighborsDirected;
 
 struct NegCycleFinder<'a> {
-    gra: &'a DiGraph<(), f64>,
+    grph: &'a DiGraph<(), f64>,
     pred: std::collections::HashMap<petgraph::graph::NodeIndex, petgraph::graph::NodeIndex>,
 }
 
 impl<'a> NegCycleFinder<'a> {
-    fn new(gra: &'a DiGraph<(), f64>) -> Self {
+    fn new(grph: &'a DiGraph<(), f64>) -> Self {
         Self {
-            gra,
+            grph,
             pred: std::collections::HashMap::new(),
         }
     }
 
     fn find_cycle(&self) -> impl Iterator<Item = petgraph::graph::NodeIndex> + '_ {
         let mut visited = std::collections::HashMap::new();
-        self.gra
+        self.grph
             .node_indices()
             .filter(move |&v| !visited.contains_key(&v))
             .filter_map(move |v| {
@@ -40,9 +40,9 @@ impl<'a> NegCycleFinder<'a> {
         F: Fn((petgraph::graph::NodeIndex, petgraph::graph::NodeIndex)) -> f64,
     {
         let mut changed = false;
-        for u in self.gra.node_indices() {
+        for u in self.grph.node_indices() {
             for v in self
-                .gra
+                .grph
                 .neighbors_directed(u, petgraph::Direction::Outgoing)
             {
                 let wt = get_weight((u, v));

@@ -78,7 +78,7 @@ where
     ///
     /// Arguments:
     ///
-    /// * `gra`: The `gra` parameter is a reference to a directed graph (`DiGraph`) with vertices of
+    /// * `grph`: The `grph` parameter is a reference to a directed graph (`DiGraph`) with vertices of
     /// type `V` and edges of type `R`.
     /// * `omega`: The `omega` parameter is of type `P`. It represents some value or parameter that is
     /// used in the implementation of the `new` function. The specific meaning or purpose of `omega`
@@ -87,9 +87,9 @@ where
     /// Returns:
     ///
     /// The `new` function is returning an instance of the struct that it is defined in.
-    pub fn new(gra: &'a DiGraph<V, R>, omega: P) -> Self {
+    pub fn new(grph: &'a DiGraph<V, R>, omega: P) -> Self {
         Self {
-            ncf: NegCycleFinder::new(gra),
+            ncf: NegCycleFinder::new(grph),
             omega,
         }
     }
