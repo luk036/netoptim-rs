@@ -259,4 +259,88 @@ mod tests {
         let result = ncf.howard(&mut dist, |e| *e.weight());
         assert!(result.is_none());
     }
+
+    #[test]
+    fn test_neg_cycle_no_edges() {
+        let digraph = DiGraph::<(), Ratio<i32>>::new();
+        let mut ncf = NegCycleFinder::new(&digraph);
+        let mut dist = [];
+        let result = ncf.howard(&mut dist, |e| *e.weight());
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_neg_cycle_self_loop() {
+        let mut digraph = DiGraph::<(), Ratio<i32>>::new();
+        let n0 = digraph.add_node(());
+        digraph.add_edge(n0, n0, Ratio::new(-1, 1));
+
+        let mut ncf = NegCycleFinder::new(&digraph);
+        let mut dist = [Ratio::new(0, 1)];
+        let result = ncf.howard(&mut dist, |e| *e.weight());
+        assert!(result.is_some());
+        let cycle = result.unwrap();
+        assert_eq!(cycle.len(), 1);
+        assert_eq!(cycle[0].source(), n0);
+        assert_eq!(cycle[0].target(), n0);
+    }
+
+    #[test]
+    fn test_neg_cycle_multiple_cycles() {
+        let digraph = DiGraph::<(), Ratio<i32>>::from_edges([
+            (0, 1, Ratio::new(1, 1)),
+            (1, 0, Ratio::new(-2, 1)), // Cycle 1: 0 -> 1 -> 0 (weight -1)
+            (2, 3, Ratio::new(1, 1)),
+            (3, 2, Ratio::new(-2, 1)), // Cycle 2: 2 -> 3 -> 2 (weight -1)
+            (0, 2, Ratio::new(1, 1)),
+        ]);
+
+        let mut ncf = NegCycleFinder::new(&digraph);
+        let mut dist = [
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+        ];
+        let result = ncf.howard(&mut dist, |e| *e.weight());
+        assert!(result.is_some());
+        // The algorithm finds one of the negative cycles.
+        // We can't assert which one, but we can assert it's a negative cycle.
+        let cycle = result.unwrap();
+        let cycle_weight: Ratio<i32> = cycle.iter().map(|e| *e.weight()).sum();
+        assert!(cycle_weight < Ratio::new(0, 1));
+    }
+
+    #[test]
+    fn test_neg_cycle_unreachable_cycle() {
+        let digraph = DiGraph::<(), Ratio<i32>>::from_edges([
+            (0, 1, Ratio::new(1, 1)),
+            (1, 2, Ratio::new(1, 1)),
+            (2, 0, Ratio::new(-3, 1)), // Cycle 1: 0 -> 1 -> 2 -> 0 (weight -1)
+            (3, 4, Ratio::new(1, 1)),
+            (4, 3, Ratio::new(-2, 1)), // Cycle 2: 3 -> 4 -> 3 (weight -1) - unreachable from 0
+        ]);
+
+        let mut ncf = NegCycleFinder::new(&digraph);
+        let mut dist = [
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+            Ratio::new(0, 1),
+        ];
+        let result = ncf.howard(&mut dist, |e| *e.weight());
+        assert!(result.is_some());
+        let cycle = result.unwrap();
+        let cycle_weight: Ratio<i32> = cycle.iter().map(|e| *e.weight()).sum();
+        assert!(cycle_weight < Ratio::new(0, 1));
+        // The found cycle should be the one reachable from the initial dist (all zeros, effectively reachable from all nodes)
+        // In this case, it should find the 0->1->2->0 cycle.
+        let expected_cycle_nodes: Vec<NodeIndex> = cycle.iter().map(|e| e.source()).collect();
+        assert!(expected_cycle_nodes.contains(&NodeIndex::new(0)));
+        assert!(expected_cycle_nodes.contains(&NodeIndex::new(1)));
+        assert!(expected_cycle_nodes.contains(&NodeIndex::new(2)));
+        assert!(!expected_cycle_nodes.contains(&NodeIndex::new(3)));
+        assert!(!expected_cycle_nodes.contains(&NodeIndex::new(4)));
+    }
 }

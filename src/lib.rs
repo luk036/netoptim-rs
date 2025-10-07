@@ -247,3 +247,89 @@ where
     }
     (distance, predecessor)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use petgraph::Graph;
+
+
+    #[test]
+    fn test_bellman_ford_negative_cycle() {
+        let graph_with_neg_cycle = Graph::<(), f32, Directed>::from_edges(&[
+            (0, 1, 1.0),
+            (1, 2, 1.0),
+            (2, 0, -3.0),
+        ]);
+        let result = bellman_ford(&graph_with_neg_cycle, NodeIndex::new(0));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_bellman_ford_no_edges() {
+        let mut graph = Graph::<(), f32, Directed>::new();
+        let n0 = graph.add_node(());
+        let result = bellman_ford(&graph, n0);
+        assert!(result.is_ok());
+        let paths = result.unwrap();
+        assert_eq!(paths.distances, vec![0.0]);
+        assert_eq!(paths.predecessors, vec![None]);
+    }
+
+    #[test]
+    fn test_bellman_ford_disconnected_components() {
+        let mut graph = Graph::<(), f32, Directed>::new();
+        let n0 = graph.add_node(());
+        let n1 = graph.add_node(());
+        let n2 = graph.add_node(());
+        graph.add_edge(n0, n1, 1.0);
+
+        let result = bellman_ford(&graph, n0);
+        assert!(result.is_ok());
+        let paths = result.unwrap();
+        // Node 2 is unreachable, so its distance should be infinite
+        assert_eq!(paths.distances.len(), 3);
+        assert_eq!(paths.distances[n0.index()], 0.0);
+        assert_eq!(paths.distances[n1.index()], 1.0);
+        assert!(paths.distances[n2.index()].is_infinite());
+        assert_eq!(paths.predecessors, vec![None, Some(n0), None]);
+    }
+
+    #[test]
+    fn test_find_negative_cycle_exists() {
+        let graph_with_neg_cycle = Graph::<(), f32, Directed>::from_edges(&[
+            (0, 1, 1.0),
+            (1, 2, 1.0),
+            (2, 0, -3.0),
+        ]);
+        let result = find_negative_cycle(&graph_with_neg_cycle, NodeIndex::new(0));
+        assert!(result.is_some());
+        let cycle = result.unwrap();
+        assert_eq!(cycle.len(), 3);
+        assert!(cycle.contains(&NodeIndex::new(0)));
+        assert!(cycle.contains(&NodeIndex::new(1)));
+        assert!(cycle.contains(&NodeIndex::new(2)));
+    }
+
+    #[test]
+    fn test_find_negative_cycle_none() {
+        let graph = Graph::<(), f32, Directed>::from_edges(&[
+            (0, 1, 1.0),
+            (1, 2, 1.0),
+            (2, 3, 1.0),
+        ]);
+        let result = find_negative_cycle(&graph, NodeIndex::new(0));
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_find_negative_cycle_unreachable() {
+        let graph = Graph::<(), f32, Directed>::from_edges(&[
+            (0, 1, 1.0),
+            (2, 3, -1.0),
+            (3, 2, -1.0),
+        ]);
+        let result = find_negative_cycle(&graph, NodeIndex::new(0));
+        assert!(result.is_none());
+    }
+}
