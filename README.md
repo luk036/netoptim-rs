@@ -7,6 +7,12 @@
 
 ## 🛠️ Installation
 
+To install the library, run the following command:
+
+```bash
+cargo install netoptim-rs
+```
+
 ### 📦 Cargo
 
 - Install the rust toolchain in order to have cargo installed by following
