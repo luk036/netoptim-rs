@@ -118,11 +118,11 @@ where
     /// Arguments:
     ///
     /// * `dist`: `dist` is a mutable reference to an array of type `D`. This array is used to store the
-    ///             distances from the source vertex to each vertex in the graph. The algorithm will update the
-    ///             distances during the execution.
+    ///   distances from the source vertex to each vertex in the graph. The algorithm will update the
+    ///   distances during the execution.
     /// * `get_weight`: `get_weight` is a closure that takes an `EdgeReference<D>` and returns the
-    ///             weight of that edge. The `howard` function uses this closure to get the weight of each edge in
-    ///             the graph.
+    ///   weight of that edge. The `howard` function uses this closure to get the weight of each edge in
+    ///   the graph.
     ///
     /// Returns:
     ///

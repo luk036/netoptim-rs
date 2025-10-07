@@ -79,10 +79,10 @@ where
     /// Arguments:
     ///
     /// * `grph`: The `grph` parameter is a reference to a directed graph (`DiGraph`) with vertices of
-    ///             type `V` and edges of type `R`.
+    ///   type `V` and edges of type `R`.
     /// * `omega`: The `omega` parameter is of type `P`. It represents some value or parameter that is
-    ///             used in the implementation of the `new` function. The specific meaning or purpose of `omega`
-    ///             would depend on the context and the code that uses this function.
+    ///   used in the implementation of the `new` function. The specific meaning or purpose of `omega`
+    ///   would depend on the context and the code that uses this function.
     ///
     /// Returns:
     ///
@@ -147,7 +147,7 @@ where
     /// assert!(!cycle.is_empty());
     /// assert_eq!(ratio, Ratio::new(-1, 3));
     /// ```
-    pub fn run(&mut self, dist: &mut [R], ratio: &mut R) -> Vec<EdgeReference<R>> {
+    pub fn run(&mut self, dist: &mut [R], ratio: &mut R) -> Vec<EdgeReference<'a, R>> {
         let mut r_min = *ratio;
         let mut c_min = Vec::<EdgeReference<R>>::new();
         let mut cycle = Vec::<EdgeReference<R>>::new();
@@ -196,7 +196,7 @@ mod tests {
 
     #[test]
     fn test_max_parametric_solver_simple_cycle() {
-        let digraph = DiGraph::<(), Ratio<i32>>::from_edges(&[
+        let digraph = DiGraph::<(), Ratio<i32>>::from_edges([
             (0, 1, Ratio::new(1, 1)),
             (1, 2, Ratio::new(1, 1)),
             (2, 0, Ratio::new(-3, 1)),
@@ -213,7 +213,7 @@ mod tests {
 
     #[test]
     fn test_max_parametric_solver_no_cycle() {
-        let digraph = DiGraph::<(), Ratio<i32>>::from_edges(&[
+        let digraph = DiGraph::<(), Ratio<i32>>::from_edges([
             (0, 1, Ratio::new(1, 1)),
             (1, 2, Ratio::new(1, 1)),
             (0, 2, Ratio::new(3, 1)),
@@ -230,7 +230,7 @@ mod tests {
 
     #[test]
     fn test_max_parametric_solver_multiple_cycles() {
-        let digraph = DiGraph::<(), Ratio<i32>>::from_edges(&[
+        let digraph = DiGraph::<(), Ratio<i32>>::from_edges([
             (0, 1, Ratio::new(1, 1)),
             (1, 0, Ratio::new(-2, 1)), // Cycle 1: ratio -1/1
             (2, 3, Ratio::new(1, 1)),
