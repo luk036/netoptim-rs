@@ -147,6 +147,26 @@ where
     /// let result = ncf.howard(&mut dist, |e| { *e.weight()});
     /// assert!(result.is_some());
     /// ```
+    /// # Example: Graph with no negative cycle
+    /// ```rust
+    /// use petgraph::prelude::*;
+    /// use netoptim_rs::neg_cycle::NegCycleFinder;
+    /// use num::rational::Ratio;
+    /// let digraph = DiGraph::<(), Ratio<i32>>::from_edges([
+    ///     (0, 1, Ratio::new(1, 1)),
+    ///     (1, 2, Ratio::new(1, 1)),
+    ///     (2, 3, Ratio::new(1, 1)),
+    /// ]);
+    /// let mut ncf = NegCycleFinder::new(&digraph);
+    /// let mut dist = [
+    ///     Ratio::new(0, 1),
+    ///     Ratio::new(0, 1),
+    ///     Ratio::new(0, 1),
+    ///     Ratio::new(0, 1),
+    /// ];
+    /// let result = ncf.howard(&mut dist, |e| { *e.weight()});
+    /// assert!(result.is_none());
+    /// ```
     pub fn howard<F>(&mut self, dist: &mut [D], get_weight: F) -> Option<Vec<EdgeReference<'a, D>>>
     where
         F: Fn(EdgeReference<D>) -> D,

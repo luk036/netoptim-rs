@@ -107,6 +107,46 @@ where
     /// Returns:
     ///
     /// a vector of `EdgeReference<R>`.
+    /// # Example
+    /// ```rust
+    /// use petgraph::graph::DiGraph;
+    /// use petgraph::prelude::*;
+    /// use num::rational::Ratio;
+    /// use netoptim_rs::parametric::{MaxParametricSolver, ParametricAPI};
+    /// use petgraph::graph::EdgeReference;
+    ///
+    /// struct TestParametricAPI;
+    ///
+    /// impl ParametricAPI<(), Ratio<i32>> for TestParametricAPI {
+    ///     fn distance(&self, ratio: &Ratio<i32>, edge: &EdgeReference<Ratio<i32>>) -> Ratio<i32> {
+    ///         *edge.weight() - *ratio
+    ///     }
+    ///
+    ///     fn zero_cancel(&self, cycle: &[EdgeReference<Ratio<i32>>]) -> Ratio<i32> {
+    ///         let mut sum_a = Ratio::new(0, 1);
+    ///         let mut sum_b = Ratio::new(0, 1);
+    ///         for edge in cycle {
+    ///             sum_a += *edge.weight();
+    ///             sum_b += Ratio::new(1, 1);
+    ///         }
+    ///         sum_a / sum_b
+    ///     }
+    /// }
+    ///
+    /// let digraph = DiGraph::<(), Ratio<i32>>::from_edges(&[
+    ///     (0, 1, Ratio::new(1, 1)),
+    ///     (1, 2, Ratio::new(1, 1)),
+    ///     (2, 0, Ratio::new(-3, 1)),
+    /// ]);
+    ///
+    /// let mut solver = MaxParametricSolver::new(&digraph, TestParametricAPI);
+    /// let mut dist = [Ratio::new(0, 1), Ratio::new(0, 1), Ratio::new(0, 1)];
+    /// let mut ratio = Ratio::new(0, 1);
+    ///
+    /// let cycle = solver.run(&mut dist, &mut ratio);
+    /// assert!(!cycle.is_empty());
+    /// assert_eq!(ratio, Ratio::new(-1, 3));
+    /// ```
     pub fn run(&mut self, dist: &mut [R], ratio: &mut R) -> Vec<EdgeReference<R>> {
         let mut r_min = *ratio;
         let mut c_min = Vec::<EdgeReference<R>>::new();
@@ -133,7 +173,7 @@ where
 mod tests {
     use super::*;
     use petgraph::graph::DiGraph;
-    
+
     use num::rational::Ratio;
 
     struct TestParametricAPI;

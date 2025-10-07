@@ -146,6 +146,20 @@ where
 ///     Some([NodeIndex::new(1), NodeIndex::new(3), NodeIndex::new(2)].to_vec())
 /// );
 /// ```
+/// # Example: Graph with no negative cycle
+/// ```rust
+/// use petgraph::Graph;
+/// use petgraph::algo::find_negative_cycle;
+/// use petgraph::prelude::*;
+///
+/// let graph = Graph::<(), f32, Directed>::from_edges(&[
+///     (0, 1, 1.0),
+///     (1, 2, 1.0),
+///     (2, 3, 1.0),
+/// ]);
+/// let result = find_negative_cycle(&graph, NodeIndex::new(0));
+/// assert!(result.is_none());
+/// ```
 pub fn find_negative_cycle<G>(g: G, source: G::NodeId) -> Option<Vec<G::NodeId>>
 where
     G: NodeCount + IntoNodeIdentifiers + IntoEdges + NodeIndexable + Visitable,
@@ -253,14 +267,10 @@ mod tests {
     use super::*;
     use petgraph::Graph;
 
-
     #[test]
     fn test_bellman_ford_negative_cycle() {
-        let graph_with_neg_cycle = Graph::<(), f32, Directed>::from_edges(&[
-            (0, 1, 1.0),
-            (1, 2, 1.0),
-            (2, 0, -3.0),
-        ]);
+        let graph_with_neg_cycle =
+            Graph::<(), f32, Directed>::from_edges(&[(0, 1, 1.0), (1, 2, 1.0), (2, 0, -3.0)]);
         let result = bellman_ford(&graph_with_neg_cycle, NodeIndex::new(0));
         assert!(result.is_err());
     }
@@ -297,11 +307,8 @@ mod tests {
 
     #[test]
     fn test_find_negative_cycle_exists() {
-        let graph_with_neg_cycle = Graph::<(), f32, Directed>::from_edges(&[
-            (0, 1, 1.0),
-            (1, 2, 1.0),
-            (2, 0, -3.0),
-        ]);
+        let graph_with_neg_cycle =
+            Graph::<(), f32, Directed>::from_edges(&[(0, 1, 1.0), (1, 2, 1.0), (2, 0, -3.0)]);
         let result = find_negative_cycle(&graph_with_neg_cycle, NodeIndex::new(0));
         assert!(result.is_some());
         let cycle = result.unwrap();
@@ -313,22 +320,16 @@ mod tests {
 
     #[test]
     fn test_find_negative_cycle_none() {
-        let graph = Graph::<(), f32, Directed>::from_edges(&[
-            (0, 1, 1.0),
-            (1, 2, 1.0),
-            (2, 3, 1.0),
-        ]);
+        let graph =
+            Graph::<(), f32, Directed>::from_edges(&[(0, 1, 1.0), (1, 2, 1.0), (2, 3, 1.0)]);
         let result = find_negative_cycle(&graph, NodeIndex::new(0));
         assert!(result.is_none());
     }
 
     #[test]
     fn test_find_negative_cycle_unreachable() {
-        let graph = Graph::<(), f32, Directed>::from_edges(&[
-            (0, 1, 1.0),
-            (2, 3, -1.0),
-            (3, 2, -1.0),
-        ]);
+        let graph =
+            Graph::<(), f32, Directed>::from_edges(&[(0, 1, 1.0), (2, 3, -1.0), (3, 2, -1.0)]);
         let result = find_negative_cycle(&graph, NodeIndex::new(0));
         assert!(result.is_none());
     }
