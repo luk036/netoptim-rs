@@ -99,10 +99,10 @@ where
     /// Arguments:
     ///
     /// * `dist`: `dist` is a mutable reference to a slice of type `R`. It represents a distance matrix
-    ///             or array, where `R` is the type of the elements in the matrix.
+    ///   or array, where `R` is the type of the elements in the matrix.
     /// * `ratio`: The `ratio` parameter is a mutable reference to a value of type `R`. It represents
-    ///             the current ratio value that is being used in the algorithm. The algorithm will update this
-    ///             value if it finds a smaller ratio during its execution.
+    ///   the current ratio value that is being used in the algorithm. The algorithm will update this
+    ///   value if it finds a smaller ratio during its execution.
     ///
     /// Returns:
     ///

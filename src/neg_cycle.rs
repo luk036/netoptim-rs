@@ -78,10 +78,10 @@ where
     /// Arguments:
     ///
     /// * `dist`: `dist` is a mutable reference to a slice of type `D`. It represents the distances from
-    ///           a source node to each node in a graph.
+    ///   a source node to each node in a graph.
     /// * `get_weight`: The `get_weight` parameter is a closure that takes an `EdgeReference<D>` as
-    ///           input and returns a value of type `D`. This closure is used to calculate the weight of each edge
-    ///           in the graph. The `EdgeReference<D>` represents a reference to an edge in the graph, and
+    ///   input and returns a value of type `D`. This closure is used to calculate the weight of each edge
+    ///   in the graph. The `EdgeReference<D>` represents a reference to an edge in the graph, and
     ///
     /// Returns:
     ///
