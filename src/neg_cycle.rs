@@ -187,7 +187,7 @@ where
     /// Arguments:
     ///
     /// * `handle`: The `handle` parameter is of type `NodeIndex`. It represents the starting node index
-    ///             from which the cycle traversal will begin.
+    ///   from which the cycle traversal will begin.
     ///
     /// Returns:
     ///

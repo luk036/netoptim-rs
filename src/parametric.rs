@@ -36,11 +36,11 @@ where
 /// Properties:
 ///
 /// * `ncf`: NegCycleFinder is a struct that is used to find negative cycles in a graph. It takes three
-///             type parameters: 'a, V, and R. 'a represents the lifetime of the struct, V represents the type of
-///             the vertices in the graph, and R represents the type of the weights or
+///   type parameters: 'a, V, and R. 'a represents the lifetime of the struct, V represents the type of
+///   the vertices in the graph, and R represents the type of the weights or
 /// * `omega`: The `omega` property is of type `P`, which is a generic type parameter that implements
-///             the `ParametricAPI` trait. This trait is not defined in the code snippet you provided, so it is
-///             likely defined elsewhere in the codebase.
+///   the `ParametricAPI` trait. This trait is not defined in the code snippet you provided, so it is
+///   likely defined elsewhere in the codebase.
 #[derive(Debug)]
 pub struct MaxParametricSolver<'a, V, R, P>
 where
