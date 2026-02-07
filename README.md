@@ -1,4 +1,4 @@
-# 🖧 netoptim-rs (under construction)
+# 🌊 netoptim-rs (under construction)
 
 [![Crates.io](https://img.shields.io/crates/v/netoptim-rs.svg)](https://crates.io/crates/netoptim-rs)
 [![Docs.rs](https://docs.rs/netoptim-rs/badge.svg)](https://docs.rs/netoptim-rs)
