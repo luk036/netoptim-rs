@@ -5,6 +5,11 @@ pub mod parametric;
 
 // pub mod min_cycle_ratio_ai;
 
+// Logging module - only available with std feature
+#[cfg(feature = "std")]
+pub mod logging;
+
+
 use petgraph::prelude::*;
 
 use petgraph::algo::{FloatMeasure, NegativeCycle};

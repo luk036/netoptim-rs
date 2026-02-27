@@ -10,11 +10,11 @@ use petgraph::visit::IntoNodeIdentifiers;
 /// Properties:
 ///
 /// * `digraph`: The `digraph` property is a reference to a directed graph (`DiGraph`) that the
-///             `NegCycleFinder` is operating on. It is annotated with a lifetime `'a`, indicating that the
-///             reference is valid for a certain scope.
+///   `NegCycleFinder` is operating on. It is annotated with a lifetime `'a`, indicating that the
+///   reference is valid for a certain scope.
 /// * `pred`: The `pred` property is a `HashMap` that maps a `NodeIndex` to a tuple containing the
-///             previous node index and an `EdgeReference`. This is used to keep track of the predecessor node and
-///             the edge that leads to that node during the process of finding negative cycles in a directed graph
+///   previous node index and an `EdgeReference`. This is used to keep track of the predecessor node and
+///   the edge that leads to that node during the process of finding negative cycles in a directed graph
 #[derive(Debug, Clone)]
 pub struct NegCycleFinder<'a, V, D> {
     pub digraph: &'a DiGraph<V, D>,
