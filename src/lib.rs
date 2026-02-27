@@ -9,7 +9,6 @@ pub mod parametric;
 #[cfg(feature = "std")]
 pub mod logging;
 
-
 use petgraph::prelude::*;
 
 use petgraph::algo::{FloatMeasure, NegativeCycle};
