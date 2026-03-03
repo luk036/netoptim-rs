@@ -1,9 +1,16 @@
-//! Bellman-Ford algorithms.
+//! Network optimization algorithms in Rust.
 
+pub mod dijkstra;
+pub mod error;
 pub mod neg_cycle;
 pub mod parametric;
+pub mod utils;
 
-// pub mod min_cycle_ratio_ai;
+pub use error::NetOptimError;
+pub use utils::*;
+
+#[cfg(test)]
+mod integration_tests;
 
 // Logging module - only available with std feature
 #[cfg(feature = "std")]
