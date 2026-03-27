@@ -1,9 +1,18 @@
 //! Network optimization algorithms in Rust.
 
+/// Dijkstra's shortest path algorithm implementation.
 pub mod dijkstra;
+
+/// Error types for network optimization.
 pub mod error;
+
+/// Negative cycle detection using Howard's algorithm.
 pub mod neg_cycle;
+
+/// Maximum parametric optimization.
 pub mod parametric;
+
+/// Graph utility functions.
 pub mod utils;
 
 pub use error::NetOptimError;
@@ -23,6 +32,10 @@ use petgraph::visit::{
     IntoEdges, IntoNodeIdentifiers, NodeCount, NodeIndexable, VisitMap, Visitable,
 };
 
+/// Result of shortest path algorithms.
+///
+/// Contains the distances from the source node to all other nodes,
+/// and the predecessor of each node along the shortest path.
 #[derive(Debug, Clone)]
 pub struct Paths<NodeId, EdgeWeight> {
     pub distances: Vec<EdgeWeight>,

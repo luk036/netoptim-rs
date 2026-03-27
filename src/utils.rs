@@ -6,7 +6,9 @@ use petgraph::Directed;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
-/// Compare two graphs for structural equality
+/// Compare two graphs for structural equality.
+///
+/// Returns `true` if both graphs have the same nodes and edges with the same weights.
 pub fn graphs_equal<N, E, Ty>(g1: &Graph<N, E, Ty>, g2: &Graph<N, E, Ty>) -> bool
 where
     N: PartialEq,
@@ -53,7 +55,9 @@ where
     true
 }
 
-/// Check if a graph contains any cycles
+/// Check if a graph contains any cycles.
+///
+/// Uses petgraph's `is_cyclic_directed` algorithm.
 pub fn has_cycle<N, E>(g: &DiGraph<N, E>) -> bool
 where
     N: Clone,
@@ -62,7 +66,9 @@ where
     is_cyclic_directed(g)
 }
 
-/// Get all nodes reachable from a given source node
+/// Get all nodes reachable from a given source node.
+///
+/// Uses breadth-first search (BFS) to traverse the graph.
 pub fn get_reachable_nodes<N, E>(g: &DiGraph<N, E>, source: NodeIndex) -> HashSet<NodeIndex>
 where
     N: Clone,
@@ -79,7 +85,9 @@ where
     reachable
 }
 
-/// Check if a graph is strongly connected
+/// Check if a directed graph is strongly connected.
+///
+/// A graph is strongly connected if there is a path from every node to every other node.
 pub fn is_strongly_connected<N, E>(g: &DiGraph<N, E>) -> bool
 where
     N: Clone,
@@ -127,7 +135,7 @@ where
     reverse_reachable == g.node_count()
 }
 
-/// Count the number of connected components in an undirected graph
+/// Count the number of connected components in an undirected graph.
 pub fn count_connected_components<N, E>(g: &Graph<N, E>) -> usize
 where
     N: Clone,
@@ -136,7 +144,7 @@ where
     connected_components(g)
 }
 
-/// Get the degree (number of edges) of each node
+/// Get the degree (number of edges) of each node in an undirected graph.
 pub fn get_node_degrees<N, E, Ty>(g: &Graph<N, E, Ty>) -> Vec<usize>
 where
     Ty: petgraph::EdgeType,
@@ -144,7 +152,9 @@ where
     g.node_indices().map(|node| g.edges(node).count()).collect()
 }
 
-/// Get the in-degree and out-degree of each node in a directed graph
+/// Get the in-degree and out-degree of each node in a directed graph.
+///
+/// Returns a vector of tuples `(in_degree, out_degree)` for each node.
 pub fn get_in_out_degrees<N, E>(g: &DiGraph<N, E>) -> Vec<(usize, usize)> {
     g.node_indices()
         .map(|node| {
@@ -159,7 +169,9 @@ pub fn get_in_out_degrees<N, E>(g: &DiGraph<N, E>) -> Vec<(usize, usize)> {
         .collect()
 }
 
-/// Serialize a graph to JSON format
+/// Serialize a graph to JSON format.
+///
+/// Returns a JSON string representation of the graph.
 pub fn serialize_graph<N, E, Ty>(g: &Graph<N, E, Ty>) -> Result<String, serde_json::Error>
 where
     N: Serialize + Clone,
@@ -196,7 +208,9 @@ where
     serde_json::to_string_pretty(&graph_json)
 }
 
-/// Deserialize a graph from JSON format
+/// Deserialize a graph from JSON format.
+///
+/// Takes a JSON string and returns a Graph.
 pub fn deserialize_graph<N, E>(json: &str) -> Result<Graph<N, E>, serde_json::Error>
 where
     N: for<'de> Deserialize<'de>,
@@ -231,7 +245,7 @@ where
     Ok(graph)
 }
 
-/// Generate a DOT format representation of the graph (for visualization with Graphviz)
+/// Generate a DOT format representation of the graph for visualization with Graphviz.
 pub fn to_dot<N, E, Ty>(g: &Graph<N, E, Ty>) -> String
 where
     N: std::fmt::Display,

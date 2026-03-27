@@ -20,7 +20,10 @@ use num::traits::Zero;
 
 use crate::neg_cycle::NegCycleFinder;
 
-/// The `ParametricAPI` trait defines two methods: `distance` and `zero_cancel`.
+/// API trait for parametric shortest path problems.
+///
+/// Implement this trait to define how distances are computed and how
+/// to find the ratio that cancels a cycle.
 pub trait ParametricAPI<E, R>
 where
     R: Copy + PartialOrd,
@@ -30,17 +33,10 @@ where
     fn zero_cancel(&self, cycle: &[EdgeReference<R>]) -> R;
 }
 
-/// The `MaxParametricSolver` struct is a generic type that takes in parameters `V`, `R`, and `P` and
-/// contains a `NegCycleFinder` and `omega` of type `P`.
+/// Maximum parametric shortest path solver.
 ///
-/// Properties:
-///
-/// * `ncf`: NegCycleFinder is a struct that is used to find negative cycles in a graph. It takes three
-///   type parameters: 'a, V, and R. 'a represents the lifetime of the struct, V represents the type of
-///   the vertices in the graph, and R represents the type of the weights or
-/// * `omega`: The `omega` property is of type `P`, which is a generic type parameter that implements
-///   the `ParametricAPI` trait. This trait is not defined in the code snippet you provided, so it is
-///   likely defined elsewhere in the codebase.
+/// Finds the minimum ratio cycle in a directed graph using Howard's algorithm
+/// for negative cycle detection.
 #[derive(Debug)]
 pub struct MaxParametricSolver<'a, V, R, P>
 where
