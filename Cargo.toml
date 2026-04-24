@@ -29,5 +29,5 @@ features = ["serde-1", "stable_graph"]
 [dev-dependencies]
 quickcheck = "1.0"
 criterion = "0.5"
-rand = "0.8"
+rand = "0.10"
 proptest = "1.0"
