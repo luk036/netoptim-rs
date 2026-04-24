@@ -206,14 +206,14 @@ cargo run --example quickcheck_tests
 Run the test suite:
 
 ```bash
-# Run all tests
-cargo test
+# Run all tests (include --all-features for full CI)
+cargo test --all-features --workspace
 
 # Run tests with output
-cargo test -- --nocapture
+cargo test --all-features --workspace -- --nocapture
 
 # Run specific test
-cargo test test_dijkstra_simple
+cargo test test_dijkstra_simple --all-features
 ```
 
 ## 📊 Running Benchmarks
@@ -225,18 +225,18 @@ The library includes benchmarks using `criterion`:
 cargo bench
 
 # Run specific benchmark
-cargo bench diijkstra_sparse
+cargo bench dijkstra_sparse
 ```
 
 ## 🔧 Features
 
 ### Default Features
 
-No features are enabled by default.
+`std` is enabled by default (includes logging support).
 
 ### Optional Features
 
-- `std`: Use standard library (enabled by default)
+- `std`: Use standard library (enabled by default, includes logging)
 
 ## 🎯 Use Cases
 
