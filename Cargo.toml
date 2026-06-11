@@ -30,4 +30,4 @@ features = ["serde-1", "stable_graph"]
 quickcheck = "1.0"
 criterion = "0.5"
 rand = "0.8"
-proptest = "1.0"
+proptest = "1.11"
