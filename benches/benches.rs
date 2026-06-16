@@ -1,6 +1,8 @@
 //! Benchmarks for netoptim-rs
 
-use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
+use std::hint::black_box;
+
+use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 use netoptim_rs::dijkstra::{dijkstra, dijkstra_path};
 use netoptim_rs::neg_cycle::NegCycleFinder;
 use num::rational::Ratio;
