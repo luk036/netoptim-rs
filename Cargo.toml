@@ -1,12 +1,15 @@
 [package]
 name = "netoptim-rs"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "Network Optimization Algorithms in Rust"
 repository = "https://github.com/luk036/netoptim-rs"
 license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--html-in-header", "src/doc-header.html"]
 
 [features]
 default = ["std"]
@@ -19,7 +22,6 @@ num = { version = "0.4.3" }
 num-traits = { version = "0.2.19" }
 log = { version = "0.4.32", optional = true }
 env_logger = { version = "0.11.10", optional = true }
-priority-queue = "2.0"
 
 [dependencies.petgraph]
 version = "0.8.3"
@@ -29,5 +31,3 @@ features = ["serde-1", "stable_graph"]
 [dev-dependencies]
 quickcheck = "1.0"
 criterion = "0.8.2"
-rand = "0.10.1"
-proptest = "1.11.0"
