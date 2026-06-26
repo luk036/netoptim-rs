@@ -53,6 +53,8 @@ impl<NodeId: PartialEq, Cost: FloatMeasure> PartialOrd for State<NodeId, Cost> {
 
 /// \[Generic\] Compute shortest paths from node `source` to all other nodes using Dijkstra's algorithm.
 ///
+/// $$ \text{dist}\[v\] = \min_{(u,v) \in E} (\text{dist}\[u\] + w(u,v)) $$
+///
 /// This implementation uses a binary heap for efficient priority queue operations.
 /// The algorithm requires non-negative edge weights.
 ///
