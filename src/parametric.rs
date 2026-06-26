@@ -22,6 +22,10 @@ use crate::neg_cycle::NegCycleFinder;
 
 /// API trait for parametric shortest path problems.
 ///
+/// The parametric shortest path problem finds the maximum ratio $r$ such that:
+///
+/// $$ d_v - d_u \le w_{uv} - r \quad \forall (u,v) \in E $$
+///
 /// Implement this trait to define how distances are computed and how
 /// to find the ratio that cancels a cycle.
 pub trait ParametricAPI<E, R>
@@ -29,7 +33,9 @@ where
     R: Copy + PartialOrd,
     E: Clone,
 {
+    /// Compute the effective edge distance $d'(w, r) = w - r$.
     fn distance(&self, ratio: &R, edge: &EdgeReference<R>) -> R;
+    /// Compute $r^* = \frac{\sum_{(u,v) \in C} w_{uv}}{|C|}$ such that the cycle's total distance is zero.
     fn zero_cancel(&self, cycle: &[EdgeReference<R>]) -> R;
 }
 
@@ -91,6 +97,8 @@ where
     }
 
     /// The function `run` finds the minimum ratio and corresponding cycle in a given graph.
+    ///
+    /// $$ r^* = \min_{C \in \text{cycles}} \frac{\sum_{(u,v) \in C} w_{uv}}{|C|} $$
     ///
     /// Arguments:
     ///
