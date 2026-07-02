@@ -41,6 +41,8 @@ where
 
 /// Maximum parametric shortest path solver.
 ///
+/// $$ d_j(\lambda) = \min_{k} \big( d_k(\lambda) + \text{cost}(k, j, \lambda) \big) $$
+///
 /// Finds the minimum ratio cycle in a directed graph using Howard's algorithm
 /// for negative cycle detection.
 #[derive(Debug)]

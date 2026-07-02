@@ -7,6 +7,10 @@ use petgraph::visit::IntoNodeIdentifiers;
 
 /// The `NegCycleFinder` struct is used to find negative cycles in a directed graph.
 ///
+/// A cycle is negative iff:
+///
+/// $$ \sum_{(u,v) \in C} w(u,v) < 0 $$
+///
 /// Properties:
 ///
 /// * `digraph`: The `digraph` property is a reference to a directed graph (`DiGraph`) that the
