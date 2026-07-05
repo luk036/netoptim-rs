@@ -148,11 +148,11 @@ where
     })
 }
 
-    /// \[Generic\] Compute shortest path from `source` to `target` using Dijkstra's algorithm.
-    ///
-    /// $$ \text{dist}(t) = \min_{P \in \text{paths}(s,t)} \sum_{(u,v) \in P} w(u,v) $$
-    ///
-    /// # Arguments
+/// \[Generic\] Compute shortest path from `source` to `target` using Dijkstra's algorithm.
+///
+/// $$ \text{dist}(t) = \min_{P \in \text{paths}(s,t)} \sum_{(u,v) \in P} w(u,v) $$
+///
+/// # Arguments
 /// * `g` - The graph to compute shortest path on
 /// * `source` - The source node index
 /// * `target` - The target node index
