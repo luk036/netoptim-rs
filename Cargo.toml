@@ -31,3 +31,7 @@ features = ["serde-1", "stable_graph"]
 [dev-dependencies]
 quickcheck = "1.0"
 criterion = "0.8.2"
+
+[[bench]]
+name = "benches"
+harness = false

@@ -12,6 +12,15 @@ pub mod neg_cycle;
 /// Maximum parametric optimization.
 pub mod parametric;
 
+/// Oracle for parametric network problems (cutting-plane / feasibility).
+pub mod network_oracle;
+
+/// Oracle for optimal matrix scaling.
+pub mod optscaling_oracle;
+
+/// Minimum cost-to-time cycle ratio solver.
+pub mod min_cycle_ratio;
+
 /// Graph utility functions.
 pub mod utils;
 

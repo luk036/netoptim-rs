@@ -78,22 +78,9 @@ where
     V: Eq + Hash + Clone,
     P: ParametricAPI<V, R>,
 {
-    /// The function creates a new instance of a struct with a given directed graph and a value.
-    ///
-    /// Arguments:
-    ///
-    /// * `grph`: The `grph` parameter is a reference to a directed graph (`DiGraph`) with vertices of
-    ///   type `V` and edges of type `R`.
-    /// * `omega`: The `omega` parameter is of type `P`. It represents some value or parameter that is
-    ///   used in the implementation of the `new` function. The specific meaning or purpose of `omega`
-    ///   would depend on the context and the code that uses this function.
-    ///
-    /// Returns:
-    ///
-    /// The `new` function is returning an instance of the struct that it is defined in.
-    pub fn new(grph: &'a DiGraph<V, R>, omega: P) -> Self {
+    pub fn new(gra: &'a DiGraph<V, R>, omega: P) -> Self {
         Self {
-            ncf: NegCycleFinder::new(grph),
+            ncf: NegCycleFinder::new(gra),
             omega,
         }
     }
