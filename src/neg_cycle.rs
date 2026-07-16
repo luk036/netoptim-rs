@@ -7,6 +7,10 @@ use petgraph::visit::IntoNodeIdentifiers;
 
 /// The `NegCycleFinder` struct is used to find negative cycles in a directed graph.
 ///
+/// A cycle is negative iff:
+///
+/// $$ \sum_{(u,v) \in C} w(u,v) < 0 $$
+///
 /// Properties:
 ///
 /// * `digraph`: The `digraph` property is a reference to a directed graph (`DiGraph`) that the
@@ -75,6 +79,8 @@ where
     /// The `relax` function updates the distances between nodes in a graph based on the weights of the
     /// edges, and returns a boolean indicating whether any distances were changed.
     ///
+    /// $$ d\[v\] > d\[u\] + w(u,v) \implies d\[v\] = d\[u\] + w(u,v) $$
+    ///
     /// Arguments:
     ///
     /// * `dist`: `dist` is a mutable reference to a slice of type `D`. It represents the distances from
@@ -128,6 +134,8 @@ where
     ///
     /// The `howard` function returns an `Option<Vec<EdgeReference<'a, D>>>`.
     /// Howard's algorithm for finding negative cycles
+    ///
+    /// $$ \text{Policy iteration: relax until fixpoint or detect cycle} $$
     ///
     /// # Examples
     ///

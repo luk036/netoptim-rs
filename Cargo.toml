@@ -1,6 +1,6 @@
 [package]
 name = "netoptim-rs"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 description = "Network Optimization Algorithms in Rust"
 repository = "https://github.com/luk036/netoptim-rs"
@@ -31,3 +31,7 @@ features = ["serde-1", "stable_graph"]
 [dev-dependencies]
 quickcheck = "1.0"
 criterion = "0.8.2"
+
+[[bench]]
+name = "benches"
+harness = false

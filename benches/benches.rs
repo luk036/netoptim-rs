@@ -177,6 +177,115 @@ fn bench_comparison_dijkstra_vs_bellman_ford(c: &mut Criterion) {
     group.finish();
 }
 
+use netoptim_rs::parametric::{MaxParametricSolver, ParametricAPI};
+use petgraph::graph::EdgeReference;
+
+struct BenchParametricAPI;
+
+impl ParametricAPI<(), f64> for BenchParametricAPI {
+    fn distance(&self, ratio: &f64, edge: &EdgeReference<f64>) -> f64 {
+        *edge.weight() - *ratio
+    }
+    fn zero_cancel(&self, cycle: &[EdgeReference<f64>]) -> f64 {
+        let sum: f64 = cycle.iter().map(|e| *e.weight()).sum();
+        sum / cycle.len() as f64
+    }
+}
+
+fn create_cycle_graph(num_nodes: usize) -> DiGraph<(), f64> {
+    let mut graph = DiGraph::new();
+    let nodes: Vec<NodeIndex> = (0..num_nodes).map(|_| graph.add_node(())).collect();
+    for i in 0..num_nodes - 1 {
+        graph.add_edge(nodes[i], nodes[i + 1], 1.0);
+    }
+    graph.add_edge(nodes[num_nodes - 1], nodes[0], -3.0); // negative cycle
+    graph
+}
+
+fn bench_max_parametric(c: &mut Criterion) {
+    let mut group = c.benchmark_group("max_parametric");
+
+    for size in [10, 50, 100, 200].iter() {
+        group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
+            let graph = create_cycle_graph(size);
+            let mut solver = MaxParametricSolver::new(&graph, BenchParametricAPI);
+            let mut dist = vec![0.0; size];
+            let mut ratio = 0.0;
+
+            b.iter(|| black_box(solver.run(black_box(&mut dist), black_box(&mut ratio))));
+        });
+    }
+
+    group.finish();
+}
+
+fn create_ratio_graph(num_nodes: usize) -> DiGraph<(), f64> {
+    let mut graph = DiGraph::new();
+    let nodes: Vec<NodeIndex> = (0..num_nodes).map(|_| graph.add_node(())).collect();
+    for i in 0..num_nodes - 1 {
+        graph.add_edge(nodes[i], nodes[i + 1], (i + 1) as f64);
+    }
+    graph.add_edge(nodes[num_nodes - 1], nodes[0], -3.0);
+    graph
+}
+
+fn bench_min_cycle_ratio(c: &mut Criterion) {
+    use netoptim_rs::min_cycle_ratio::min_cycle_ratio;
+
+    let mut group = c.benchmark_group("min_cycle_ratio");
+
+    for size in [10, 50, 100, 200].iter() {
+        group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
+            let graph = create_ratio_graph(size);
+            let mut dist = vec![0.0; size];
+            let mut r0 = 0.0;
+
+            b.iter(|| {
+                black_box(min_cycle_ratio(
+                    black_box(&graph),
+                    black_box(&mut r0),
+                    |e| *e.weight(),
+                    |_| 1.0,
+                    black_box(&mut dist),
+                ))
+            });
+        });
+    }
+
+    group.finish();
+}
+
+fn bench_network_oracle(c: &mut Criterion) {
+    use netoptim_rs::network_oracle::{NetworkOracle, OracleFn};
+
+    struct BenchOracle;
+
+    impl OracleFn<f64> for BenchOracle {
+        type X = f64;
+        fn eval(&self, edge: &EdgeReference<f64>, _x: &f64) -> f64 {
+            *edge.weight()
+        }
+        fn grad(&self, _edge: &EdgeReference<f64>, _x: &f64) -> f64 {
+            1.0
+        }
+    }
+
+    let mut group = c.benchmark_group("network_oracle");
+
+    for size in [10, 50, 100, 200].iter() {
+        group.bench_with_input(BenchmarkId::from_parameter(size), size, |b, &size| {
+            let graph = create_cycle_graph(size);
+            let potential = vec![0.0; size];
+            let mut oracle = NetworkOracle::new(&graph, potential, BenchOracle);
+            let x = 0.0;
+
+            b.iter(|| black_box(oracle.assess_feas(black_box(&x))));
+        });
+    }
+
+    group.finish();
+}
+
 criterion_group!(
     benches,
     bench_dijkstra_sparse,
@@ -184,7 +293,10 @@ criterion_group!(
     bench_dijkstra_path,
     bench_neg_cycle_finder,
     bench_graph_creation,
-    bench_comparison_dijkstra_vs_bellman_ford
+    bench_comparison_dijkstra_vs_bellman_ford,
+    bench_max_parametric,
+    bench_min_cycle_ratio,
+    bench_network_oracle
 );
 
 criterion_main!(benches);

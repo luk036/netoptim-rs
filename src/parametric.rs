@@ -22,6 +22,10 @@ use crate::neg_cycle::NegCycleFinder;
 
 /// API trait for parametric shortest path problems.
 ///
+/// The parametric shortest path problem finds the maximum ratio $r$ such that:
+///
+/// $$ d_v - d_u \le w_{uv} - r \quad \forall (u,v) \in E $$
+///
 /// Implement this trait to define how distances are computed and how
 /// to find the ratio that cancels a cycle.
 pub trait ParametricAPI<E, R>
@@ -29,11 +33,15 @@ where
     R: Copy + PartialOrd,
     E: Clone,
 {
+    /// Compute the effective edge distance $d'(w, r) = w - r$.
     fn distance(&self, ratio: &R, edge: &EdgeReference<R>) -> R;
+    /// Compute $r^* = \frac{\sum_{(u,v) \in C} w_{uv}}{|C|}$ such that the cycle's total distance is zero.
     fn zero_cancel(&self, cycle: &[EdgeReference<R>]) -> R;
 }
 
 /// Maximum parametric shortest path solver.
+///
+/// $$ d_j(\lambda) = \min_{k} \big( d_k(\lambda) + \text{cost}(k, j, \lambda) \big) $$
 ///
 /// Finds the minimum ratio cycle in a directed graph using Howard's algorithm
 /// for negative cycle detection.
@@ -70,27 +78,16 @@ where
     V: Eq + Hash + Clone,
     P: ParametricAPI<V, R>,
 {
-    /// The function creates a new instance of a struct with a given directed graph and a value.
-    ///
-    /// Arguments:
-    ///
-    /// * `grph`: The `grph` parameter is a reference to a directed graph (`DiGraph`) with vertices of
-    ///   type `V` and edges of type `R`.
-    /// * `omega`: The `omega` parameter is of type `P`. It represents some value or parameter that is
-    ///   used in the implementation of the `new` function. The specific meaning or purpose of `omega`
-    ///   would depend on the context and the code that uses this function.
-    ///
-    /// Returns:
-    ///
-    /// The `new` function is returning an instance of the struct that it is defined in.
-    pub fn new(grph: &'a DiGraph<V, R>, omega: P) -> Self {
+    pub fn new(gra: &'a DiGraph<V, R>, omega: P) -> Self {
         Self {
-            ncf: NegCycleFinder::new(grph),
+            ncf: NegCycleFinder::new(gra),
             omega,
         }
     }
 
     /// The function `run` finds the minimum ratio and corresponding cycle in a given graph.
+    ///
+    /// $$ r^* = \min_{C \in \text{cycles}} \frac{\sum_{(u,v) \in C} w_{uv}}{|C|} $$
     ///
     /// Arguments:
     ///

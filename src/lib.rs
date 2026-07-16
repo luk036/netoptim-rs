@@ -12,6 +12,15 @@ pub mod neg_cycle;
 /// Maximum parametric optimization.
 pub mod parametric;
 
+/// Oracle for parametric network problems (cutting-plane / feasibility).
+pub mod network_oracle;
+
+/// Oracle for optimal matrix scaling.
+pub mod optscaling_oracle;
+
+/// Minimum cost-to-time cycle ratio solver.
+pub mod min_cycle_ratio;
+
 /// Graph utility functions.
 pub mod utils;
 
@@ -43,6 +52,8 @@ pub struct Paths<NodeId, EdgeWeight> {
 }
 
 /// \[Generic\] Compute shortest paths from node `source` to all other.
+///
+/// $$ \text{dist}^{(k+1)}\[v\] = \min\left(\text{dist}^{(k)}\[v\], \min_{(u,v) \in E} (\text{dist}^{(k)}\[u\] + w(u,v))\right) $$
 ///
 /// Using the [Bellman–Ford algorithm][bf]; negative edge costs are
 /// permitted, but the graph must not have a cycle of negative weights
@@ -139,6 +150,8 @@ where
 }
 
 /// \[Generic\] Find the path of a negative cycle reachable from node `source`.
+///
+/// $$ \text{A cycle } C \text{ is negative iff } \sum_{(u,v) \in C} w(u,v) < 0 $$
 ///
 /// Using the [find_negative_cycle][nc]; will search the Graph for negative cycles using
 /// [Bellman–Ford algorithm][bf]. If no negative cycle is found the function will return `None`.
