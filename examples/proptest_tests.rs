@@ -2,8 +2,8 @@
 //!
 //! Run with: `cargo test --example proptest_tests`
 
-use proptest::prelude::*;
 use petgraph::prelude::*;
+use proptest::prelude::*;
 
 #[allow(dead_code)]
 fn test_graph() -> impl Strategy<Value = Graph<(), f64>> {
