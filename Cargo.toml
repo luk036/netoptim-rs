@@ -29,7 +29,7 @@ features = ["serde-1", "stable_graph"]
 
 
 [dev-dependencies]
-quickcheck = "1.0"
+proptest = "1"
 criterion = "0.8.2"
 
 [[bench]]
