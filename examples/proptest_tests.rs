@@ -5,6 +5,7 @@
 use proptest::prelude::*;
 use petgraph::prelude::*;
 
+#[allow(dead_code)]
 fn test_graph() -> impl Strategy<Value = Graph<(), f64>> {
     (1..7usize).prop_map(|size| {
         let mut graph = Graph::new();
