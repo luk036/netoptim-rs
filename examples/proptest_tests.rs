@@ -3,9 +3,7 @@
 //! Run with: `cargo test --example proptest_tests`
 
 use proptest::prelude::*;
-use netoptim_rs::bellman_ford;
 use petgraph::prelude::*;
-use petgraph::visit::NodeIndexable;
 
 fn test_graph() -> impl Strategy<Value = Graph<(), f64>> {
     (1..7usize).prop_map(|size| {
