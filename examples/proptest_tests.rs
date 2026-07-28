@@ -1,11 +1,8 @@
 //! Property-based tests using proptest for netoptim-rs
-//!
-//! Run with: `cargo test --example proptest_tests`
 
 use petgraph::prelude::*;
 use proptest::prelude::*;
 
-#[allow(dead_code)]
 fn test_graph() -> impl Strategy<Value = Graph<(), f64>> {
     (1..7usize).prop_map(|size| {
         let mut graph = Graph::new();
