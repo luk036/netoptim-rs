@@ -2,6 +2,7 @@
 name = "netoptim-rs"
 version = "0.1.3"
 edition = "2021"
+rust-version = "1.70"
 description = "Network Optimization Algorithms in Rust"
 repository = "https://github.com/luk036/netoptim-rs"
 license = "MIT OR Apache-2.0"
