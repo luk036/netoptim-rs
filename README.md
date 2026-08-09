@@ -27,12 +27,6 @@ Add this to your `Cargo.toml`:
 netoptim-rs = "0.1"
 ```
 
-Or install via cargo:
-
-```bash
-cargo install netoptim-rs
-```
-
 ## 📚 Quick Start
 
 ### Bellman-Ford Algorithm
