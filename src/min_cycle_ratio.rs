@@ -22,13 +22,15 @@ where
     }
 
     fn zero_cancel(&self, cycle: &[EdgeReference<D>]) -> D {
-        let mut total_cost = (self.get_cost)(&cycle[0]);
-        let mut total_time = (self.get_time)(&cycle[0]);
-        for edge in &cycle[1..] {
-            total_cost = total_cost + (self.get_cost)(edge);
-            total_time = total_time + (self.get_time)(edge);
-        }
-        total_cost / total_time
+        let total_cost = cycle
+            .iter()
+            .map(|e| (self.get_cost)(e))
+            .fold(None, |acc, c| Some(acc.map_or(c, |a| a + c)));
+        let total_time = cycle
+            .iter()
+            .map(|e| (self.get_time)(e))
+            .fold(None, |acc, t| Some(acc.map_or(t, |a| a + t)));
+        total_cost.expect("cycle must not be empty") / total_time.expect("cycle must not be empty")
     }
 }
 

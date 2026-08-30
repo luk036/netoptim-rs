@@ -13,11 +13,7 @@ use std::collections::BinaryHeap;
 ///
 /// Contains the distances from the source node to all other nodes,
 /// and the predecessor of each node along the shortest path.
-#[derive(Debug, Clone)]
-pub struct DijkstraResult<NodeId, EdgeWeight> {
-    pub distances: Vec<EdgeWeight>,
-    pub predecessors: Vec<Option<NodeId>>,
-}
+pub type DijkstraResult<NodeId, EdgeWeight> = crate::Paths<NodeId, EdgeWeight>;
 
 /// State for the priority queue in Dijkstra's algorithm.
 /// Contains a node and its current cost from the source.

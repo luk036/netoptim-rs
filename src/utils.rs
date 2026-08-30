@@ -6,6 +6,15 @@ use petgraph::Directed;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
+/// Intermediate JSON representation of a graph, shared by
+/// [`serialize_graph`] and [`deserialize_graph`].
+#[derive(Serialize, Deserialize)]
+struct GraphJSON<N, E> {
+    nodes: Vec<(usize, N)>,
+    edges: Vec<(usize, usize, E)>,
+    directed: bool,
+}
+
 /// Compare two graphs for structural equality.
 ///
 /// Returns `true` if both graphs have the same nodes and edges with the same weights.
@@ -178,14 +187,6 @@ where
     E: Serialize + Clone,
     Ty: petgraph::EdgeType + 'static,
 {
-    #[derive(Serialize)]
-    #[allow(dead_code)]
-    struct GraphJSON<N, E> {
-        nodes: Vec<(usize, N)>,
-        edges: Vec<(usize, usize, E)>,
-        directed: bool,
-    }
-
     let nodes: Vec<(usize, N)> = g
         .node_indices()
         .map(|node| (node.index(), g[node].clone()))
@@ -216,14 +217,6 @@ where
     N: for<'de> Deserialize<'de>,
     E: for<'de> Deserialize<'de>,
 {
-    #[derive(Deserialize)]
-    #[allow(dead_code)]
-    struct GraphJSON<N, E> {
-        nodes: Vec<(usize, N)>,
-        edges: Vec<(usize, usize, E)>,
-        directed: bool,
-    }
-
     let graph_json: GraphJSON<N, E> = serde_json::from_str(json)?;
 
     let mut graph = Graph::new();
