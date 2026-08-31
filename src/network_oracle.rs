@@ -11,6 +11,7 @@ pub struct GradVec(pub Vec<f64>);
 
 impl std::ops::Neg for GradVec {
     type Output = GradVec;
+    #[inline]
     fn neg(self) -> GradVec {
         GradVec(self.0.into_iter().map(|x| -x).collect())
     }
@@ -69,6 +70,7 @@ where
         }
     }
 
+    #[inline]
     pub fn update(&mut self, gamma: &D) {
         self.oracle.update(gamma);
     }
@@ -107,10 +109,12 @@ mod tests {
     impl OracleFn<Ratio<i32>> for TestOracle {
         type X = Ratio<i32>;
 
+        #[inline]
         fn eval(&self, edge: &EdgeReference<Ratio<i32>>, x: &Ratio<i32>) -> Ratio<i32> {
             *edge.weight() - *x
         }
 
+        #[inline]
         fn grad(&self, _edge: &EdgeReference<Ratio<i32>>, _x: &Ratio<i32>) -> Ratio<i32> {
             Ratio::new(-1, 1)
         }

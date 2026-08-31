@@ -24,6 +24,7 @@ struct State<NodeId, Cost> {
 }
 
 impl<NodeId: PartialEq, Cost: PartialEq> PartialEq for State<NodeId, Cost> {
+    #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.node == other.node && self.cost == other.cost
     }
@@ -42,6 +43,7 @@ impl<NodeId: PartialEq, Cost: FloatMeasure> Ord for State<NodeId, Cost> {
 }
 
 impl<NodeId: PartialEq, Cost: FloatMeasure> PartialOrd for State<NodeId, Cost> {
+    #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }

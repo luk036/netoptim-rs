@@ -154,6 +154,7 @@ where
 }
 
 /// Get the degree (number of edges) of each node in an undirected graph.
+#[inline]
 pub fn get_node_degrees<N, E, Ty>(g: &Graph<N, E, Ty>) -> Vec<usize>
 where
     Ty: petgraph::EdgeType,

@@ -13,6 +13,7 @@ struct Ratio<F> {
 }
 
 impl<F> Ratio<F> {
+    #[inline]
     fn new(get_cost: F) -> Self {
         Ratio { get_cost }
     }

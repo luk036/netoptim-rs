@@ -420,6 +420,7 @@ mod tests {
     struct TestParametricAPI;
 
     impl ParametricAPI<(), Ratio<i32>> for TestParametricAPI {
+        #[inline]
         fn distance(&self, ratio: &Ratio<i32>, edge: &EdgeReference<Ratio<i32>>) -> Ratio<i32> {
             *edge.weight() - *ratio
         }

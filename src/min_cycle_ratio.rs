@@ -17,6 +17,7 @@ where
     F1: Fn(&EdgeReference<D>) -> D,
     F2: Fn(&EdgeReference<D>) -> D,
 {
+    #[inline]
     fn distance(&self, ratio: &D, edge: &EdgeReference<D>) -> D {
         (self.get_cost)(edge) - *ratio * (self.get_time)(edge)
     }
