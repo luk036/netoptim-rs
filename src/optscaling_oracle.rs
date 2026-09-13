@@ -1,4 +1,4 @@
-use crate::network_oracle::{Cut, GradVec, NetworkOracle, OracleFn};
+use crate::network_oracle::{Cut, GradVec, NetworkOracle, OracleFn, WeightFn};
 use petgraph::graph::{DiGraph, EdgeReference};
 
 pub struct OptScalingOracle<'a, V, F>
@@ -28,6 +28,19 @@ where
     fn eval(&self, edge: &EdgeReference<f64>, x: &GradVec) -> f64 {
         let (aij, aji) = (self.get_cost)(edge);
         f64::min(x.0[0] - aji, aij - x.0[1])
+    }
+
+    fn make_weight_fn<'s>(&'s self, x: &'s Self::X) -> WeightFn<'s, f64>
+    where
+        f64: 's,
+    {
+        let x0 = x.0[0];
+        let x1 = x.0[1];
+        let get_cost = &self.get_cost;
+        Box::new(move |edge| {
+            let (aij, aji) = get_cost(&edge);
+            f64::min(x0 - aji, aij - x1)
+        })
     }
 
     fn grad(&self, edge: &EdgeReference<f64>, x: &GradVec) -> GradVec {
@@ -93,5 +106,21 @@ mod tests {
         let mut gamma = 0.0;
         let (_cut, updated) = oracle.assess_optim(&x, &mut gamma);
         assert!(!updated); // infeasible → no gamma update
+    }
+
+    #[test]
+    fn test_ratio_make_weight_fn_matches_eval() {
+        let gra = DiGraph::<(), f64>::from_edges([(0, 1, 1.0), (1, 0, 2.0)]);
+        let get_cost = |edge: &EdgeReference<f64>| (edge.weight() * 2.0, edge.weight() + 1.0);
+        let ratio = Ratio::new(get_cost);
+        let x = GradVec(vec![1.5, -0.5]);
+        let weight = ratio.make_weight_fn(&x);
+
+        let mut checked = 0;
+        for edge in gra.edge_references() {
+            assert!((weight(edge) - ratio.eval(&edge, &x)).abs() < 1e-12);
+            checked += 1;
+        }
+        assert!(checked > 0);
     }
 }
