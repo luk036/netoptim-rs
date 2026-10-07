@@ -21,10 +21,14 @@ pub mod optscaling_oracle;
 /// Minimum cost-to-time cycle ratio solver.
 pub mod min_cycle_ratio;
 
+/// Solver facades driving the oracles with the ellipsoid cutting-plane method.
+pub mod solve;
+
 /// Graph utility functions.
 pub mod utils;
 
 pub use error::NetOptimError;
+pub use solve::{default_options, solve_network_feas, solve_opt_scaling, DEFAULT_TOLERANCE};
 pub use utils::*;
 
 #[cfg(test)]
