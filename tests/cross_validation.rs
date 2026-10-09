@@ -122,6 +122,7 @@ fn test_xval_min_cycle_ratio_5node() {
 // C++ test_parametric.cpp: 5-node [2,1,1,1,1], r=0 → no neg cycle
 // =========================================================================
 
+#[allow(clippy::upper_case_acronyms)]
 struct CPP;
 
 impl ParametricAPI<(), Ratio<i32>> for CPP {

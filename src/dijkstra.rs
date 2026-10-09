@@ -13,11 +13,7 @@ use std::collections::BinaryHeap;
 ///
 /// Contains the distances from the source node to all other nodes,
 /// and the predecessor of each node along the shortest path.
-#[derive(Debug, Clone)]
-pub struct DijkstraResult<NodeId, EdgeWeight> {
-    pub distances: Vec<EdgeWeight>,
-    pub predecessors: Vec<Option<NodeId>>,
-}
+pub type DijkstraResult<NodeId, EdgeWeight> = crate::Paths<NodeId, EdgeWeight>;
 
 /// State for the priority queue in Dijkstra's algorithm.
 /// Contains a node and its current cost from the source.
@@ -28,6 +24,7 @@ struct State<NodeId, Cost> {
 }
 
 impl<NodeId: PartialEq, Cost: PartialEq> PartialEq for State<NodeId, Cost> {
+    #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.node == other.node && self.cost == other.cost
     }
@@ -46,6 +43,7 @@ impl<NodeId: PartialEq, Cost: FloatMeasure> Ord for State<NodeId, Cost> {
 }
 
 impl<NodeId: PartialEq, Cost: FloatMeasure> PartialOrd for State<NodeId, Cost> {
+    #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }

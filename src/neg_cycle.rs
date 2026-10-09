@@ -25,6 +25,23 @@ pub struct NegCycleFinder<'a, V, D> {
     pub pred: std::collections::HashMap<NodeIndex, (NodeIndex, EdgeReference<'a, D>)>,
 }
 
+/// Returned by [`NegCycleFinder::howard_with_max_iter`] when the relaxation
+/// budget is exhausted before a negative cycle is found.
+///
+/// [`NegCycleFinder::howard`] is unbounded; on degenerate graphs its relaxation
+/// loop can run for a very long time. The capped variant turns a potential hang
+/// into this recoverable error.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MaxIterExceeded;
+
+impl std::fmt::Display for MaxIterExceeded {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Howard's method exceeded the iteration budget")
+    }
+}
+
+impl std::error::Error for MaxIterExceeded {}
+
 impl<'a, V, D> NegCycleFinder<'a, V, D>
 where
     D: std::ops::Add<Output = D> + std::cmp::PartialOrd + Copy,
@@ -187,6 +204,46 @@ where
             }
         }
         None
+    }
+
+    /// Like [`howard`](Self::howard), but abandons the search after `max_iter`
+    /// relaxation rounds.
+    ///
+    /// Returns `Ok(None)` when the graph has no negative cycle (relaxation
+    /// reached a fixpoint), `Ok(Some(cycle))` when one is found, or
+    /// [`MaxIterExceeded`] when the budget elapses first.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use petgraph::prelude::*;
+    /// use netoptim_rs::neg_cycle::NegCycleFinder;
+    /// let digraph = DiGraph::<(), i32>::from_edges([(0, 1, 1), (1, 2, 1), (2, 0, -3)]);
+    /// let mut ncf = NegCycleFinder::new(&digraph);
+    /// let mut dist = [0, 0, 0];
+    /// assert!(ncf.howard_with_max_iter(&mut dist, |e| *e.weight(), 100).is_ok());
+    /// ```
+    pub fn howard_with_max_iter<F>(
+        &mut self,
+        dist: &mut [D],
+        get_weight: F,
+        max_iter: usize,
+    ) -> Result<Option<Vec<EdgeReference<'a, D>>>, MaxIterExceeded>
+    where
+        F: Fn(EdgeReference<D>) -> D,
+    {
+        self.pred.clear();
+        let mut iters = 0usize;
+        while self.relax(dist, &get_weight) {
+            iters += 1;
+            if let Some(vtx) = self.find_cycle() {
+                return Ok(Some(self.cycle_list(vtx)));
+            }
+            if iters >= max_iter {
+                return Err(MaxIterExceeded);
+            }
+        }
+        Ok(None)
     }
 
     /// The function `cycle_list` takes a node index as input and returns a vector of edge references
@@ -370,5 +427,54 @@ mod tests {
         assert!(expected_cycle_nodes.contains(&NodeIndex::new(2)));
         assert!(!expected_cycle_nodes.contains(&NodeIndex::new(3)));
         assert!(!expected_cycle_nodes.contains(&NodeIndex::new(4)));
+    }
+
+    #[test]
+    fn test_howard_with_max_iter_finds_cycle() {
+        let digraph = DiGraph::<(), Ratio<i32>>::from_edges([
+            (0, 1, Ratio::new(1, 1)),
+            (1, 2, Ratio::new(1, 1)),
+            (2, 0, Ratio::new(-3, 1)),
+        ]);
+        let mut ncf = NegCycleFinder::new(&digraph);
+        let mut dist = [Ratio::new(0, 1); 3];
+        assert!(matches!(
+            ncf.howard_with_max_iter(&mut dist, |e| *e.weight(), 100),
+            Ok(Some(_))
+        ));
+    }
+
+    #[test]
+    fn test_howard_with_max_iter_budget_exceeded() {
+        let digraph = DiGraph::<(), Ratio<i32>>::from_edges([
+            (0, 1, Ratio::new(1, 1)),
+            (1, 2, Ratio::new(1, 1)),
+            (2, 3, Ratio::new(1, 1)),
+        ]);
+        let mut ncf = NegCycleFinder::new(&digraph);
+        let mut dist = [
+            Ratio::new(0, 1),
+            Ratio::new(10, 1),
+            Ratio::new(10, 1),
+            Ratio::new(10, 1),
+        ];
+        assert!(matches!(
+            ncf.howard_with_max_iter(&mut dist, |e| *e.weight(), 0),
+            Err(MaxIterExceeded)
+        ));
+    }
+
+    #[test]
+    fn test_howard_with_max_iter_no_cycle_within_budget() {
+        let digraph = DiGraph::<(), Ratio<i32>>::from_edges([
+            (0, 1, Ratio::new(1, 1)),
+            (1, 2, Ratio::new(1, 1)),
+        ]);
+        let mut ncf = NegCycleFinder::new(&digraph);
+        let mut dist = [Ratio::new(0, 1), Ratio::new(10, 1), Ratio::new(10, 1)];
+        assert!(matches!(
+            ncf.howard_with_max_iter(&mut dist, |e| *e.weight(), 100),
+            Ok(None)
+        ));
     }
 }

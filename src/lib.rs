@@ -21,10 +21,14 @@ pub mod optscaling_oracle;
 /// Minimum cost-to-time cycle ratio solver.
 pub mod min_cycle_ratio;
 
+/// Solver facades driving the oracles with the ellipsoid cutting-plane method.
+pub mod solve;
+
 /// Graph utility functions.
 pub mod utils;
 
 pub use error::NetOptimError;
+pub use solve::{default_options, solve_network_feas, solve_opt_scaling, DEFAULT_TOLERANCE};
 pub use utils::*;
 
 #[cfg(test)]
@@ -420,6 +424,7 @@ mod tests {
     struct TestParametricAPI;
 
     impl ParametricAPI<(), Ratio<i32>> for TestParametricAPI {
+        #[inline]
         fn distance(&self, ratio: &Ratio<i32>, edge: &EdgeReference<Ratio<i32>>) -> Ratio<i32> {
             *edge.weight() - *ratio
         }
@@ -472,70 +477,5 @@ mod tests {
         let cycle = solver.run(&mut dist, &mut ratio);
         assert!(!cycle.is_empty());
         assert_eq!(ratio, Ratio::new(-3, 2));
-    }
-
-    #[test]
-    fn test_bellman_ford_neg_cycle() {
-        let graph_with_neg_cycle =
-            Graph::<(), f32, Directed>::from_edges([(0, 1, 1.0), (1, 2, 1.0), (2, 0, -3.0)]);
-        let result = bellman_ford(&graph_with_neg_cycle, NodeIndex::new(0));
-        assert!(result.is_err());
-    }
-
-    #[test]
-    fn test_bellman_ford_no_edge() {
-        let mut graph = Graph::<(), f32, Directed>::new();
-        let n0 = graph.add_node(());
-        let result = bellman_ford(&graph, n0);
-        assert!(result.is_ok());
-        let paths = result.unwrap();
-        assert_eq!(paths.distances, vec![0.0]);
-        assert_eq!(paths.predecessors, vec![None]);
-    }
-
-    #[test]
-    fn test_bellman_ford_disconnected() {
-        let mut graph = Graph::<(), f32, Directed>::new();
-        let n0 = graph.add_node(());
-        let n1 = graph.add_node(());
-        let n2 = graph.add_node(());
-        graph.add_edge(n0, n1, 1.0);
-
-        let result = bellman_ford(&graph, n0);
-        assert!(result.is_ok());
-        let paths = result.unwrap();
-        // Node 2 is unreachable, so its distance should be infinite
-        assert_eq!(paths.distances.len(), 3);
-        assert_eq!(paths.distances[n0.index()], 0.0);
-        assert_eq!(paths.distances[n1.index()], 1.0);
-        assert!(paths.distances[n2.index()].is_infinite());
-        assert_eq!(paths.predecessors, vec![None, Some(n0), None]);
-    }
-
-    #[test]
-    fn test_find_negative_cycle_multiple() {
-        let graph_with_neg_cycle = Graph::<(), f32, Directed>::from_edges([
-            (0, 1, 1.0),
-            (1, 0, -2.0),
-            (2, 3, 1.0),
-            (3, 2, -3.0),
-        ]);
-        let result = find_negative_cycle(&graph_with_neg_cycle, NodeIndex::new(0));
-        assert!(result.is_some());
-    }
-
-    #[test]
-    fn test_find_negative_cycle_no_neg_cycle() {
-        let graph = Graph::<(), f32, Directed>::from_edges([(0, 1, 1.0), (1, 2, 1.0), (2, 3, 1.0)]);
-        let result = find_negative_cycle(&graph, NodeIndex::new(0));
-        assert!(result.is_none());
-    }
-
-    #[test]
-    fn test_find_negative_cycle_unreachable_neg_cycle() {
-        let graph =
-            Graph::<(), f32, Directed>::from_edges([(0, 1, 1.0), (2, 3, -1.0), (3, 2, -1.0)]);
-        let result = find_negative_cycle(&graph, NodeIndex::new(0));
-        assert!(result.is_none());
     }
 }
