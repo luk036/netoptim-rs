@@ -15,6 +15,9 @@ pub mod parametric;
 /// Oracle for parametric network problems (cutting-plane / feasibility).
 pub mod network_oracle;
 
+/// Oracle for minimum-period / maximum-yield clock skew scheduling.
+pub mod css_oracle;
+
 /// Oracle for optimal matrix scaling.
 pub mod optscaling_oracle;
 
@@ -27,6 +30,7 @@ pub mod solve;
 /// Graph utility functions.
 pub mod utils;
 
+pub use css_oracle::ClockScheduleOracle;
 pub use error::NetOptimError;
 pub use solve::{default_options, solve_network_feas, solve_opt_scaling, DEFAULT_TOLERANCE};
 pub use utils::*;
