@@ -98,19 +98,27 @@ where
     {
         let get_weight = self.oracle.make_weight_fn(x);
 
-        if let Some(cycle) = self.ncf.howard(&mut self.potential, get_weight) {
-            let f: f64 = -cycle
+        // Howard may surface several critical cycles; keep the most-violated
+        // (minimum total weight) one so the cut is the deepest separating plane.
+        let mut best: Option<Cut<F::X>> = None;
+        let mut min_weight = 0.0f64;
+        for cycle in self.ncf.howard_all(&mut self.potential, get_weight) {
+            let weight_sum: f64 = cycle
                 .iter()
                 .map(|edge| self.oracle.eval(edge, x))
                 .filter_map(|d| d.to_f64())
                 .sum::<f64>();
-            let g: F::X = -cycle
-                .iter()
-                .map(|edge| self.oracle.grad(edge, x))
-                .sum::<F::X>();
-            return Some((g, f));
+            if weight_sum < min_weight {
+                min_weight = weight_sum;
+                let f = -weight_sum;
+                let g: F::X = -cycle
+                    .iter()
+                    .map(|edge| self.oracle.grad(edge, x))
+                    .sum::<F::X>();
+                best = Some((g, f));
+            }
         }
-        None
+        best
     }
 }
 

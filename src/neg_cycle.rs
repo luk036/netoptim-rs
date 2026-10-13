@@ -206,6 +206,58 @@ where
         None
     }
 
+    /// The `find_cycles` function returns **all** cycle start nodes in the
+    /// predecessor map, in the same style as [`find_cycle`](Self::find_cycle).
+    pub fn find_cycles(&self) -> Vec<NodeIndex> {
+        let mut result = Vec::new();
+        let mut visited = std::collections::HashMap::new();
+        for vtx in self.digraph.node_identifiers() {
+            if visited.contains_key(&vtx) {
+                continue;
+            }
+            let mut utx = vtx;
+            while !visited.contains_key(&utx) {
+                visited.insert(utx, vtx);
+                if !self.pred.contains_key(&utx) {
+                    break;
+                }
+                let (prev, _) = self.pred[&utx];
+                utx = prev;
+                if visited.contains_key(&utx) {
+                    if visited[&utx] == vtx {
+                        result.push(utx);
+                    }
+                    break;
+                }
+            }
+        }
+        result
+    }
+
+    /// Like [`howard`](Self::howard), but returns **every** cycle found in the
+    /// first predecessor graph that contains at least one cycle.
+    ///
+    /// Howard may surface several critical cycles at once; callers that need
+    /// the most-violated one (rather than an arbitrary first) iterate the
+    /// returned list.
+    pub fn howard_all<F>(&mut self, dist: &mut [D], get_weight: F) -> Vec<Vec<EdgeReference<'a, D>>>
+    where
+        F: Fn(EdgeReference<D>) -> D,
+    {
+        self.pred.clear();
+        let mut result = Vec::new();
+        while self.relax(dist, &get_weight) {
+            let cycles = self.find_cycles();
+            if !cycles.is_empty() {
+                for vtx in cycles {
+                    result.push(self.cycle_list(vtx));
+                }
+                break;
+            }
+        }
+        result
+    }
+
     /// Like [`howard`](Self::howard), but abandons the search after `max_iter`
     /// relaxation rounds.
     ///
