@@ -331,9 +331,9 @@ checksum = "91622ff5e7162018101f2fea40d6ebf4a78bbe5a49736a2020649edf9693679e"
 
 [[package]]
 name = "ellalgo-rs"
-version = "0.1.10"
+version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3d180ef0d1d1cce519814e77c7fe9a4e4cc4b3acad24fd1845f874d3e8116e55"
+checksum = "5b73c8bab1626faadd68c29cd1397148ff3c6e2d802bb04c0a24f855148b14ae"
 dependencies = [
  "log",
  "svgbobdoc",
